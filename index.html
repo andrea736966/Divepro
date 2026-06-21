@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#042C53">
+<title>DiveMaster Pro</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Noto Sans TC',sans-serif;background:#eee}
+#app{display:flex;flex-direction:column;height:100%;max-width:430px;margin:0 auto;background:#f5f5f3;position:relative}
+/* topbar */
+#topbar{background:#fff;border-bottom:1px solid #e8e8e8;padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:#042C53;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.logo-name{font-size:15px;font-weight:700;color:#1a1a1a;line-height:1.1}
+.logo-sub{font-size:10px;color:#999;letter-spacing:.4px}
+.top-btns{display:flex;gap:8px}
+.icon-btn{width:36px;height:36px;border-radius:9px;background:#f5f5f3;border:1px solid #e8e8e8;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center}
+.icon-btn:active{opacity:.6}
+/* scroll */
+#scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+#scroll::-webkit-scrollbar{display:none}
+/* tabbar */
+#tabbar{background:#fff;border-top:1px solid #e8e8e8;display:flex;flex-shrink:0;padding-bottom:max(4px,env(safe-area-inset-bottom))}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;cursor:pointer;border:none;background:none;gap:2px;min-height:52px}
+.tab:active{opacity:.6}
+.tab-icon{font-size:21px;line-height:1}
+.tab-lbl{font-size:10px;font-weight:500;color:#aaa;font-family:inherit}
+.tab.on .tab-lbl{color:#042C53;font-weight:700}
+/* screens */
+.screen{display:none;padding:16px;padding-bottom:max(90px,calc(env(safe-area-inset-bottom)+80px))}
+.screen.on{display:block}
+/* cards */
+.card{background:#fff;border-radius:14px;border:1px solid #e8e8e8;padding:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card-press{cursor:pointer}.card-press:active{opacity:.75}
+/* typography */
+.t-h1{font-size:22px;font-weight:700;color:#1a1a1a;letter-spacing:-.3px}
+.t-h2{font-size:16px;font-weight:600;color:#1a1a1a}
+.t-h3{font-size:14px;font-weight:600;color:#1a1a1a}
+.t-body{font-size:14px;color:#333;line-height:1.5}
+.t-small{font-size:12px;color:#888;line-height:1.5}
+.t-xs{font-size:11px;color:#aaa}
+.t-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:#888}
+/* layout helpers */
+.row{display:flex;align-items:center}
+.row-between{display:flex;align-items:center;justify-content:space-between}
+.gap8{gap:8px}.gap12{gap:12px}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:16px 0 8px}
+.section-action{font-size:13px;color:#185FA5;cursor:pointer;padding:4px}
+/* badges */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:600;white-space:nowrap}
+.b-green{background:#E1F5EE;color:#085041}
+.b-amber{background:#FAEEDA;color:#633806}
+.b-red{background:#FCEBEB;color:#791F1F}
+.b-blue{background:#E6F1FB;color:#0C447C}
+.b-gray{background:#f0f0f0;color:#666}
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:opacity .15s}
+.btn:active{opacity:.75}
+.btn-primary{background:#042C53;color:#B5D4F4}
+.btn-secondary{background:#f5f5f3;color:#333;border:1px solid #e0e0e0}
+.btn-danger{background:#FCEBEB;color:#791F1F}
+.btn-success{background:#E1F5EE;color:#085041}
+.btn-full{width:100%;display:flex}
+.btn-sm{padding:7px 14px;font-size:12px}
+.add-btn{width:38px;height:38px;border-radius:10px;background:#042C53;border:none;color:#B5D4F4;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.add-btn:active{opacity:.7}
+/* form */
+.form-group{margin-bottom:14px}
+.flabel{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:#888;margin-bottom:6px;display:block}
+.finput{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #ddd;background:#f9f9f7;color:#1a1a1a;font-size:15px;font-family:inherit;-webkit-appearance:none;display:block;margin-bottom:0}
+.finput:focus{outline:none;border-color:#185FA5;background:#fff}
+.finput::placeholder{color:#bbb}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-error{font-size:12px;color:#E24B4A;margin-top:4px}
+/* select grid */
+.sel-grid{display:flex;flex-wrap:wrap;gap:8px}
+.sel-opt{padding:7px 14px;border-radius:100px;border:1px solid #ddd;background:#f9f9f7;color:#666;font-size:13px;font-weight:500;cursor:pointer;user-select:none}
+.sel-opt:active{opacity:.6}
+.sel-opt.on{background:#042C53;color:#B5D4F4;border-color:#042C53}
+/* chip bar */
+.chip-bar{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none;padding-bottom:2px}
+.chip-bar::-webkit-scrollbar{display:none}
+.chip{padding:6px 14px;border-radius:100px;border:1px solid #ddd;background:#f9f9f7;color:#666;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;user-select:none}
+.chip:active{opacity:.6}
+.chip.on{background:#042C53;color:#B5D4F4;border-color:#042C53}
+/* progress */
+.prog-track{height:6px;background:#f0f0f0;border-radius:100px;overflow:hidden}
+.prog-fill{height:100%;border-radius:100px;transition:width .6s}
+/* metrics */
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.metric{background:#fff;border-radius:12px;border:1px solid #e8e8e8;padding:12px 14px}
+.metric-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#aaa;margin-bottom:5px}
+.metric-val{font-size:22px;font-weight:700;color:#1a1a1a;letter-spacing:-.5px}
+.metric-sub{font-size:11px;margin-top:3px}
+/* avatar */
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+/* divider */
+.divider{height:1px;background:#f0f0f0;margin:10px 0}
+/* toggle */
+.tog{position:relative;width:44px;height:26px;flex-shrink:0;display:inline-block}
+.tog input{position:absolute;opacity:0;width:0;height:0}
+.tog-track{position:absolute;inset:0;border-radius:13px;background:#ddd;cursor:pointer;transition:background .2s}
+.tog input:checked+.tog-track{background:#185FA5}
+.tog-thumb{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s;pointer-events:none}
+.tog input:checked+.tog-track .tog-thumb{transform:translateX(18px)}
+/* settings rows */
+.s-group{background:#fff;border-radius:14px;border:1px solid #e8e8e8;overflow:hidden;margin-bottom:10px}
+.s-row{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none}
+.s-row:active{background:#f5f5f3}
+.s-row+.s-row{border-top:1px solid #f0f0f0}
+.s-icon{font-size:18px;width:26px;text-align:center;flex-shrink:0}
+.s-text{flex:1}
+.s-title{font-size:15px;font-weight:500;color:#1a1a1a}
+.s-sub{font-size:12px;color:#aaa;margin-top:1px}
+.s-chev{color:#ccc;font-size:18px}
+/* lang/currency grid */
+.option-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.option-card{border:2px solid #e8e8e8;border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;background:#f9f9f7;user-select:none}
+.option-card:active{opacity:.7}
+.option-card.on{border-color:#185FA5;background:#E6F1FB}
+.option-card-name{font-size:14px;font-weight:700;color:#555}
+.option-card.on .option-card-name{color:#185FA5}
+.option-card-sub{font-size:10px;color:#aaa;margin-top:2px}
+/* scan */
+.scan-btn{width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#042C53,#185FA5);color:#B5D4F4;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
+.scan-btn:active{opacity:.8}
+.scan-btn.scanning{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.scan-result{background:#E1F5EE;border:1px solid #9FE1CB;border-radius:10px;padding:12px;margin-bottom:14px}
+/* upload */
+.upload-area{border:2px dashed #ddd;border-radius:12px;padding:20px;text-align:center;cursor:pointer;background:#f9f9f7;margin-bottom:12px}
+.upload-area:active{border-color:#185FA5;background:#E6F1FB}
+.upload-area.has-file{border-color:#1D9E75;border-style:solid;background:#E1F5EE}
+/* cost type cards */
+.cost-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.cost-type-card{padding:12px;border-radius:12px;border:2px solid #e8e8e8;background:#f9f9f7;cursor:pointer;text-align:center;user-select:none}
+.cost-type-card:active{opacity:.7}
+.cost-type-card.on{border-color:#185FA5;background:#E6F1FB}
+/* pricing result */
+.pricing-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.pricing-box{border-radius:12px;padding:12px;text-align:center}
+.pricing-box-val{font-size:20px;font-weight:700}
+.pricing-box-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:3px}
+/* pro gate */
+.pro-gate{border:2px dashed #ddd;border-radius:14px;padding:24px;text-align:center;margin-bottom:14px}
+/* modal */
+#modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center}
+#modal-bg.on{display:flex}
+#modal-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;max-height:92vh;overflow-y:auto;padding-bottom:max(24px,env(safe-area-inset-bottom))}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:#ddd;margin:10px auto 0}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid #f0f0f0}
+.modal-title{font-size:16px;font-weight:700;color:#1a1a1a}
+.modal-cancel{font-size:15px;color:#185FA5;cursor:pointer;padding:4px}
+.modal-save{font-size:15px;font-weight:700;color:#185FA5;cursor:pointer;padding:4px}
+.modal-body{padding:16px;padding-bottom:20px}
+/* empty */
+.empty{text-align:center;padding:48px 24px;color:#bbb;font-size:14px;line-height:1.8}
+/* trip type icons */
+.trip-type-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.trip-type-card{border:2px solid #e8e8e8;border-radius:12px;padding:12px 6px;text-align:center;cursor:pointer;background:#f9f9f7}
+.trip-type-card:active{opacity:.7}
+.trip-type-card.on{border-color:#185FA5;background:#E6F1FB}
+/* help */
+.help-section{margin-bottom:20px}
+.help-title{font-size:16px;font-weight:700;color:#1a1a1a;border-bottom:2px solid #E6F1FB;padding-bottom:8px;margin-bottom:12px}
+.help-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #f5f5f5}
+.help-num{width:26px;height:26px;border-radius:50%;background:#042C53;color:#B5D4F4;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.faq-item{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f5f5f5}
+.faq-q{font-size:13px;font-weight:700;color:#042C53;margin-bottom:3px}
+.faq-a{font-size:13px;color:#555;line-height:1.6}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div class="logo">
+      <div class="logo-icon">🤿</div>
+      <div>
+        <div class="logo-name">DiveMaster Pro</div>
+        <div class="logo-sub" id="l-sub">旅程管理系統</div>
+      </div>
+    </div>
+    <div class="top-btns">
+      <div class="icon-btn" onclick="showWelcomeModal()" title="說明">❓</div>
+      <div class="icon-btn" onclick="gotoTab('settings')" title="設定">⚙️</div>
+    </div>
+  </div>
+  <div id="scroll">
+    <div id="sc-overview"  class="screen on"></div>
+    <div id="sc-trips"     class="screen"></div>
+    <div id="sc-people"    class="screen"></div>
+    <div id="sc-finance"   class="screen"></div>
+    <div id="sc-docs"      class="screen"></div>
+    <div id="sc-settings"  class="screen"></div>
+    <div id="sc-help"      class="screen"></div>
+  </div>
+  <div id="tabbar">
+    <button class="tab on" id="tab-overview"  onclick="gotoTab('overview')"><div class="tab-icon">🏠</div><div class="tab-lbl" id="tl-ov">總覽</div></button>
+    <button class="tab"    id="tab-trips"     onclick="gotoTab('trips')"><div class="tab-icon">🗓</div><div class="tab-lbl" id="tl-tr">旅程</div></button>
+    <button class="tab"    id="tab-people"    onclick="gotoTab('people')"><div class="tab-icon">👥</div><div class="tab-lbl" id="tl-pe">成員</div></button>
+    <button class="tab"    id="tab-finance"   onclick="gotoTab('finance')"><div class="tab-icon">💰</div><div class="tab-lbl" id="tl-fi">財務</div></button>
+    <button class="tab"    id="tab-docs"      onclick="gotoTab('docs')"><div class="tab-icon">📁</div><div class="tab-lbl" id="tl-do">文件</div></button>
+  </div>
+</div>
+
+<div id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div id="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <span class="modal-cancel" id="m-cancel" onclick="closeModal()">取消</span>
+      <span class="modal-title"  id="m-title"></span>
+      <span class="modal-save"   id="m-save"   onclick="modalSave()">儲存</span>
+    </div>
+    <div class="modal-body" id="m-body" style="padding-bottom:300px"></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   GLOBALS
+═══════════════════════════════════════════ */
+var LG  = localStorage.getItem('dmp_lg')  || 'zh';
+var CUR = localStorage.getItem('dmp_cur') || 'TWD';
+var PRO = localStorage.getItem('dmp_pro') === '1';
+var INVITE_CODE = localStorage.getItem('dmp_code') || 'AN773773';
+var modalMode = '';
+var selTripId = '';
+var selCert = 'ow';
+var selOrg  = 'padi';
+var selExpCat = 'charter';
+var selCostType = 'A';
+var selDocCat = 'insuranceDAN';
+var selTripType = 'liveaboard';
+var uploadedFile = null;
+var uploadedFileName = '';
+var uploadedFileType = '';
+var editProfileField = 'name';
+var API_KEY = localStorage.getItem('dmp_apikey') || '';
+
+/* ═══════════════════════════════════════════
+   CURRENCIES
+═══════════════════════════════════════════ */
+var CURR = {
+  TWD:{sym:'NT$',name:'TWD'}, USD:{sym:'$',name:'USD'},   HKD:{sym:'HK$',name:'HKD'},
+  JPY:{sym:'¥',name:'JPY'},   KRW:{sym:'₩',name:'KRW'},   THB:{sym:'฿',name:'THB'},
+  IDR:{sym:'Rp',name:'IDR'},  PHP:{sym:'₱',name:'PHP'},   VND:{sym:'₫',name:'VND'},
+  SGD:{sym:'S$',name:'SGD'},  EUR:{sym:'€',name:'EUR'},   GBP:{sym:'£',name:'GBP'},
+  AUD:{sym:'A$',name:'AUD'}
+};
+function fc(n){ var c=CURR[CUR]||CURR.TWD; return c.sym+Math.round(Number(n)||0).toLocaleString(); }
+/* Approximate exchange rates to TWD (user can override per expense) */
+var RATES_TO_TWD={TWD:1,USD:32,HKD:4.1,JPY:0.21,KRW:0.024,THB:0.9,IDR:0.002,PHP:0.55,VND:0.0013,SGD:24,EUR:35,GBP:41,AUD:21};
+
+/* ═══════════════════════════════════════════
+   STRINGS
+═══════════════════════════════════════════ */
+var S = {
+zh:{
+  sub:'旅程管理系統', tabs:['總覽','旅程','成員','財務','文件'],
+  overview:'季節總覽', activeTrips:'進行中旅程', participants:'參與人數', paymentsDue:'待收款項', totalExpenses:'費用記錄',
+  upcomingTrips:'即將出發', roster:'成員名單', budget:'費用摘要', checklist:'裝備清單', insuranceDocs:'保險與文件',
+  viewAll:'查看全部 →', manage:'管理 →', details:'詳情 →',
+  trips:'旅程管理', newTrip:'新增旅程', noTrips:'尚無旅程\n點 + 新增第一個旅程',
+  tripName:'旅程名稱', dest:'目的地', charter:'租船 / 船隻', dep:'出發日期', ret:'返回日期', focRule:'FOC規則（幾人送1免費，0=無）', margin:'目標利潤率 %',
+  tripTypes:{liveaboard:'🚢 船宿',resort:'🏝️ 渡假村',daytrip:'🤿 一日船潛'},
+  people:'成員管理', addPerson:'新增成員', noPeople:'尚無成員\n點 + 新增',
+  fullName:'全名', email:'電子郵件（選填）', phone:'電話', passport:'護照號碼', insurance:'保險號碼',
+  certLevel:'證照等級', certOrg:'發證機構', certNum:'證照號碼', amtDue:'應付金額',
+  certLevels:{ow:'開放水域',aow:'進階開放水域',rescue:'救援',dm:'潛水長',instructor:'教練',tech:'技術',other:'其他'},
+  orgs:{sditdi:'SDI/TDI',padi:'PADI',ssi:'SSI',cmas:'CMAS',naui:'NAUI',bsac:'BSAC',raid:'RAID',aida:'AIDA',molchanovs:'Molchanovs',pfi:'PFI',other:'其他'},
+  paid:'已付款', partial:'部分付款', pending:'待付款', active:'進行中', planning:'規劃中', completed:'已完成',
+  totalPaid:'已付', balance:'餘額', recordPay:'記錄付款', enterAmt:'輸入付款金額：',
+  finance:'財務管理', addExpense:'新增費用', collected:'已收款', outstanding:'未收款', totalCost:'費用總計',
+  expDesc:'描述', expAmt:'金額', expDate:'日期', expCat:'類別', costType:'費用類型',
+  costTypeA:'🤿 A類：渡假村/船公司包含', costTypeASub:'教練免費，不計入分攤',
+  costTypeB:'✈️ B類：額外費用', costTypeBSub:'教練份額由付費團員分攤',
+  cats:{charter:'租船',accommodation:'住宿',equipment:'裝備',gas:'氣體/Nitrox',flights:'機票',insurance:'保險',tips:'小費',food:'餐飲',transport:'交通',permits:'許可證/公園費',other:'其他'},
+  pricingCalc:'收費計算機', totalPax:'總人數（含教練）', coachCount:'教練總人數', focAuto:'船公司FOC（自動計算）', extraCoach:'超額教練（無FOC）', payingPax:'付費人數', calcBtn:'🧮 立即計算',
+  perPersonCost:'每人成本', suggestedPrice:'建議每人收費', breakEven:'損益平衡點', netProfit:'預計獲利', profitMargin:'利潤率', coachProfit:'每位教練分潤',
+  noExpenses:'尚無費用，點 + 新增', proGateTitle:'教練版功能', proGateDesc:'輸入邀請碼解鎖完整收費計算機及利潤分析',
+  unlockBtn:'🗝️ 輸入邀請碼解鎖', inviteCode:'邀請碼', wrongCode:'邀請碼錯誤，請重試',
+  docs:'文件管理', addDoc:'新增文件', noDoc:'尚無文件',
+  docName:'文件名稱', docCat:'類別', docExp:'有效期限（到期日，永久有效可留空）', forWho:'所屬成員', allParts:'全體成員',
+  docCats:{insuranceDAN:'DAN 保險',medicalForms:'健康聲明書',certCards:'證照卡',flightDetails:'航班資訊',passports:'護照副本',waivers:'免責聲明書',other:'其他'},
+  uploadFile:'上傳檔案', tapUpload:'點擊選擇檔案', uploadSub:'PDF、圖片、Word 均可',
+  scanBtn:'📷 拍照掃描自動填入', scanning:'AI 分析中…', scanDone:'掃描完成，已自動填入：', scanFail:'無法識別，請手動填寫', scanHint:'支援護照、潛水證照、保險卡',
+  expScanBtn:'📷 拍照辨識費用自動填入', expScanHint:'支援收據、報價單、對話截圖，AI自動填入描述/金額/類別',
+  aiScanSetup:'AI 掃描設定', aiScanDesc:'證照掃描和費用辨識功能需要你自己的 Anthropic API 金鑰才能使用。金鑰只存在你的裝置上，不會傳給任何第三方。',
+  saveKey:'儲存金鑰', keySet:'已設定金鑰，掃描功能可使用', keyNotSet:'尚未設定金鑰，掃描功能無法使用',
+  apiKeyHelp:'申請步驟：1. 前往 console.anthropic.com 註冊（免信用卡）2. 完成手機驗證可獲得約 $5 美金免費額度 3. 進入 API Keys 頁面建立金鑰，複製貼到上方欄位。每次掃描約花費不到 0.3 美分，$5額度可用約上千次。',
+  backupRestore:'資料備份與還原', backupDesc:'所有資料只存在這台裝置的瀏覽器裡。建議定期匯出備份檔案；也可用備份檔案把資料轉移到其他裝置（手動同步）。',
+  exportBtn:'⬇️ 匯出備份檔', importBtn:'⬆️ 匯入備份檔還原',
+  backupHelp:'匯出：產生一個 .json 檔案，包含所有旅程、成員、費用、文件記錄與個人資料設定（不含API金鑰）。匯入：選擇備份檔案後會用檔案內容覆蓋目前所有資料，請謹慎操作。',
+  restoreConfirm:'匯入備份將會覆蓋目前所有資料（旅程、成員、費用、文件），確定要繼續嗎？此操作無法復原。',
+  restoreSuccess:'✅ 還原成功！頁面將重新載入。', restoreFail:'❌ 檔案格式錯誤，無法還原',
+  exportFileName:'潛水長App備份',
+  importBtn2:'📥 匯入Excel', importTitle:'匯入團員名單', importDesc:'上傳 Excel(.xlsx) 或 CSV 檔案，第一列須為標題列。支援的欄位名稱（中英皆可，順序不限）：',
+  importCols:'姓名(必填) / 護照號碼 / Email / 電話 / 證照等級 / 發證機構 / 證照號碼 / 應付金額',
+  importTemplateBtn:'📄 下載範本檔案', importParseFail:'無法讀取檔案，請確認格式是否正確',
+  importNoRows:'未偵測到有效資料列', importPreview:'偵測到 {n} 筆資料，請確認後匯入（可取消不需要的項目）：',
+  importAddBtn:'匯入選中項目', importDone:'已成功匯入 {n} 筆團員資料',
+  emailNote:'※ 掃描無法讀取 Email，請掃描後手動補填',
+  settings:'設定', language:'語言', currency:'幣別', profile:'個人資料',
+  pName:'姓名', pCert:'證書編號', pOrg:'發證機構', editName:'編輯姓名', editCert:'編輯證書', editOrg:'編輯機構',
+  prefs:'偏好設定', notif:'通知', notifSub:'付款提醒', darkMode:'深色模式', darkSub:'跟隨系統',
+  about:'關於', version:'版本', privacy:'隱私政策', terms:'服務條款', feedback:'意見回饋',
+  privacy_t:'隱私政策', privacy_b:'DiveMaster Pro 將所有資料儲存於您的裝置。我們不收集任何個人資訊。\n\n最後更新：2026年6月',
+  terms_t:'服務條款', terms_b:'本 App 為潛水旅程規劃工具，不能取代專業潛水安全訓練。',
+  feedback_t:'意見回饋', feedback_b:'📧 feedback@divemasterpro.app\n\n感謝您的使用與回饋！',
+  proSection:'專業版（教練專用）', proUnlocked:'🔓 專業版已解鎖', changeCodes:'修改邀請碼', lockPro:'鎖定專業版', lockProSub:'切換回客人版',
+  currentCode:'目前邀請碼', newCode:'新邀請碼（至少4字元）', codeUpdated:'邀請碼已更新為：',
+  resetAll:'清除所有資料', resetConfirm:'確定要清除所有資料？此操作無法復原。',
+  replayIntro:'重新觀看介紹',
+  help:'使用說明',
+  delTrip:'確定刪除此旅程？', delPerson:'確定移除此成員？', delDoc:'確定刪除此文件？', delExp:'確定刪除此費用？',
+  healthy:'健康', low:'偏低', loss:'虧損',
+  viewDoc:'查看', typeA:'總額', typeB:'每人',
+  bugReport:'問題回報', bugDesc:'請截圖並說明：\n1. 在哪個頁面\n2. 做了什麼操作\n3. 出現什麼問題\n\n傳給管理員即可。',
+  copyTemplate:'複製回報範本', copied:'已複製！',
+  foc_calc:'FOC 自動算：', pax_info:'付費：', free_info:'免費：',
+  autoLoadedPax:'✅ 已從成員名單自動讀取：共', people_unit:'人'
+},
+en:{
+  sub:'Trip Management', tabs:['Overview','Trips','People','Finance','Docs'],
+  overview:'Season Overview', activeTrips:'Active Trips', participants:'Participants', paymentsDue:'Payments Due', totalExpenses:'Expenses',
+  upcomingTrips:'Upcoming Trips', roster:'Participants', budget:'Cost Summary', checklist:'Equipment', insuranceDocs:'Insurance & Docs',
+  viewAll:'View all →', manage:'Manage →', details:'Details →',
+  trips:'Trips', newTrip:'New Trip', noTrips:'No trips yet\nTap + to add your first trip',
+  tripName:'Trip Name', dest:'Destination', charter:'Charter / Vessel', dep:'Departure Date', ret:'Return Date', focRule:'FOC Rule (every N = 1 free, 0=none)', margin:'Target Margin %',
+  tripTypes:{liveaboard:'🚢 Liveaboard',resort:'🏝️ Resort',daytrip:'🤿 Day Trip'},
+  people:'People', addPerson:'Add Participant', noPeople:'No participants yet\nTap + to add',
+  fullName:'Full Name', email:'Email (optional)', phone:'Phone', passport:'Passport Number', insurance:'Insurance Number',
+  certLevel:'Cert Level', certOrg:'Cert Org', certNum:'Cert Number', amtDue:'Amount Due',
+  certLevels:{ow:'Open Water',aow:'Advanced OW',rescue:'Rescue',dm:'Divemaster',instructor:'Instructor',tech:'Technical',other:'Other'},
+  orgs:{sditdi:'SDI/TDI',padi:'PADI',ssi:'SSI',cmas:'CMAS',naui:'NAUI',bsac:'BSAC',raid:'RAID',aida:'AIDA',molchanovs:'Molchanovs',pfi:'PFI',other:'Other'},
+  paid:'Paid', partial:'Partial', pending:'Pending', active:'Active', planning:'Planning', completed:'Completed',
+  totalPaid:'Paid', balance:'Balance', recordPay:'Record Payment', enterAmt:'Enter payment amount:',
+  finance:'Finance', addExpense:'Add Expense', collected:'Collected', outstanding:'Outstanding', totalCost:'Total Cost',
+  expDesc:'Description', expAmt:'Amount', expDate:'Date', expCat:'Category', costType:'Cost Type',
+  costTypeA:'🤿 Type A: Resort/Boat Included', costTypeASub:'Coach-free, not split among pax',
+  costTypeB:'✈️ Type B: Extra Costs', costTypeBSub:"Coach's share split among paying pax",
+  cats:{charter:'Charter',accommodation:'Accommodation',equipment:'Equipment',gas:'Gas/Nitrox',flights:'Flights',insurance:'Insurance',tips:'Tips',food:'Food',transport:'Transport',permits:'Permits/Park Fees',other:'Other'},
+  pricingCalc:'Pricing Calculator', totalPax:'Total Pax (incl. coaches)', coachCount:'Total Coaches', focAuto:'Boat FOC (auto-calculated)', extraCoach:'Extra Coaches (no FOC)', payingPax:'Paying Pax', calcBtn:'🧮 Calculate Now',
+  perPersonCost:'Cost per Person', suggestedPrice:'Suggested Price', breakEven:'Break-Even', netProfit:'Est. Profit', profitMargin:'Profit Margin', coachProfit:'Per Coach Profit',
+  noExpenses:'No expenses yet. Tap + to add.', proGateTitle:'Coach Features', proGateDesc:'Enter your invite code to unlock the full pricing calculator and profit analysis',
+  unlockBtn:'🗝️ Enter Invite Code', inviteCode:'Invite Code', wrongCode:'Incorrect code. Please try again.',
+  docs:'Documents', addDoc:'Add Document', noDoc:'No documents yet',
+  docName:'Document Name', docCat:'Category', docExp:'Expiry Date (leave blank if permanent)', forWho:'For Participant', allParts:'All Participants',
+  docCats:{insuranceDAN:'DAN Insurance',medicalForms:'Medical Form',certCards:'Cert Card',flightDetails:'Flight Details',passports:'Passport Copy',waivers:'Waiver',other:'Other'},
+  uploadFile:'Upload File', tapUpload:'Tap to choose a file', uploadSub:'PDF, images, Word supported',
+  scanBtn:'📷 Scan Photo to Auto-Fill', scanning:'AI analysing…', scanDone:'Scan complete. Auto-filled:', scanFail:'Could not read. Please fill manually.', scanHint:'Passport, dive cert, insurance card',
+  expScanBtn:'📷 Scan Receipt to Auto-Fill', expScanHint:'Supports receipts, quotes, chat screenshots — AI fills desc/amount/category',
+  aiScanSetup:'AI Scan Setup', aiScanDesc:'Document scanning and receipt recognition require your own Anthropic API key. The key is stored only on your device and never sent to any third party.',
+  saveKey:'Save Key', keySet:'Key set — scanning is available', keyNotSet:'No key set — scanning unavailable',
+  apiKeyHelp:'Setup: 1. Sign up at console.anthropic.com (no credit card needed) 2. Verify your phone number to get ~$5 free credit 3. Go to API Keys, create one, and paste it above. Each scan costs under $0.003 — $5 covers ~1000 scans.',
+  backupRestore:'Data Backup & Restore', backupDesc:'All data lives only in this device\'s browser. Export backups regularly, and use a backup file to move data to another device (manual sync).',
+  exportBtn:'⬇️ Export Backup', importBtn:'⬆️ Import Backup to Restore',
+  backupHelp:'Export: creates a .json file with all trips, people, expenses, docs and profile settings (excludes API key). Import: selecting a backup file OVERWRITES all current data — use with care.',
+  restoreConfirm:'Importing a backup will overwrite ALL current data (trips, people, expenses, docs). This cannot be undone. Continue?',
+  restoreSuccess:'✅ Restored successfully! The page will reload.', restoreFail:'❌ Invalid file format — could not restore',
+  exportFileName:'DiveMasterPro_Backup',
+  importBtn2:'📥 Import Excel', importTitle:'Import Member List', importDesc:'Upload an Excel (.xlsx) or CSV file with a header row. Supported column names (Chinese or English, any order):',
+  importCols:'Name (required) / Passport / Email / Phone / Cert Level / Cert Org / Cert Number / Amount Due',
+  importTemplateBtn:'📄 Download Template', importParseFail:'Could not read file — check the format',
+  importNoRows:'No valid rows detected', importPreview:'Detected {n} row(s). Review and uncheck any you don\'t want:',
+  importAddBtn:'Import Selected', importDone:'Successfully imported {n} member(s)',
+  emailNote:'※ Scan cannot read email. Please fill in manually after scanning.',
+  settings:'Settings', language:'Language', currency:'Currency', profile:'Profile',
+  pName:'Your Name', pCert:'Cert Number', pOrg:'Organisation', editName:'Edit Name', editCert:'Edit Cert', editOrg:'Edit Org',
+  prefs:'Preferences', notif:'Notifications', notifSub:'Payment reminders', darkMode:'Dark Mode', darkSub:'Follow system',
+  about:'About', version:'Version', privacy:'Privacy Policy', terms:'Terms of Service', feedback:'Send Feedback',
+  privacy_t:'Privacy Policy', privacy_b:'DiveMaster Pro stores all data on your device. We collect no personal information.\n\nLast updated: June 2026',
+  terms_t:'Terms of Service', terms_b:'This app is a dive trip planning tool and does not replace professional dive safety training.',
+  feedback_t:'Send Feedback', feedback_b:'📧 feedback@divemasterpro.app\n\nThank you for your feedback!',
+  proSection:'Pro Mode (Coaches Only)', proUnlocked:'🔓 Pro Mode Unlocked', changeCodes:'Change Invite Code', lockPro:'Lock Pro Mode', lockProSub:'Switch to guest view',
+  currentCode:'Current Code', newCode:'New Code (min 4 characters)', codeUpdated:'Invite code updated to:',
+  resetAll:'Reset All Data', resetConfirm:'Reset all data? This cannot be undone.',
+  replayIntro:'View Introduction Again',
+  help:'User Guide',
+  delTrip:'Delete this trip?', delPerson:'Remove this participant?', delDoc:'Delete this document?', delExp:'Delete this expense?',
+  healthy:'Healthy', low:'Low', loss:'Loss',
+  viewDoc:'View', typeA:'Total', typeB:'Per-Person',
+  bugReport:'Report a Bug', bugDesc:'Please screenshot and describe:\n1. Which screen\n2. What you did\n3. What went wrong\n\nSend to your admin.',
+  copyTemplate:'Copy Report Template', copied:'Copied!',
+  foc_calc:'FOC auto-calc: ', pax_info:'Paying: ', free_info:'Free: ',
+  autoLoadedPax:'✅ Auto-loaded from participants: ', people_unit:' pax'
+}};
+// Fallback for other languages
+['ja','ko','th','id','fil','vi','es','fr','de'].forEach(function(c){ S[c]=S.en; });
+function T(k){ return S[LG][k]||k; }
+function TT(obj,k){ var o=S[LG][obj]; return (o&&o[k])||k; }
+
+/* ═══════════════════════════════════════════
+   DATABASE
+═══════════════════════════════════════════ */
+var DB;
+var PROFILE = JSON.parse(localStorage.getItem('dmp_profile')||'{"name":"","cert":"","org":""}');
+
+function initDB(){
+  var saved = localStorage.getItem('dmp_v2');
+  if(saved){
+    try{ DB = JSON.parse(saved); return; }catch(e){}
+  }
+  DB = {
+    trips:[], people:[], expenses:[],
+    checklist:[], docs:[]
+  };
+  saveDB();
+}
+function saveDB(){ try{ localStorage.setItem('dmp_v2', JSON.stringify(DB)); }catch(e){} }
+function uid(){ return Math.random().toString(36).slice(2,9)+Date.now().toString(36); }
+
+/* ═══════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════ */
+var AVC=[['#E1F5EE','#085041'],['#E6F1FB','#0C447C'],['#FAEEDA','#633806'],['#FAECE7','#712B13'],['#EEEDFE','#3C3489']];
+function avHtml(name,sz){
+  sz=sz||36;
+  var i=name.split('').reduce(function(a,c){return a+c.charCodeAt(0);},0)%AVC.length;
+  var ini=name.split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
+  return '<div class="av" style="width:'+sz+'px;height:'+sz+'px;background:'+AVC[i][0]+';color:'+AVC[i][1]+';font-size:'+Math.round(sz*.34)+'px">'+ini+'</div>';
+}
+function payStatus(p){
+  if(p.paid>=p.due) return 'paid';
+  if(p.paid>0) return 'partial';
+  return 'pending';
+}
+function badgeHtml(status){
+  var map={paid:'b-green',partial:'b-amber',pending:'b-red',active:'b-green',planning:'b-amber',completed:'b-blue'};
+  var lbl={paid:T('paid'),partial:T('partial'),pending:T('pending'),active:T('active'),planning:T('planning'),completed:T('completed')};
+  return '<span class="badge '+(map[status]||'b-gray')+'">'+(lbl[status]||status)+'</span>';
+}
+function fd(s){
+  if(!s) return '';
+  var d=new Date(s+'T00:00:00');
+  return d.toLocaleDateString(LG==='zh'?'zh-TW':'en-US',{month:'short',day:'numeric'});
+}
+function fdFull(s){
+  if(!s) return '';
+  var d=new Date(s+'T00:00:00');
+  return d.toLocaleDateString(LG==='zh'?'zh-TW':'en-US',{year:'numeric',month:'short',day:'numeric'});
+}
+function catLabel(c){ return TT('cats',c)||c; }
+function tripTypeLabel(t){ return TT('tripTypes',t)||t; }
+
+/* ═══════════════════════════════════════════
+   PRO MODE
+═══════════════════════════════════════════ */
+function isPro(){ return PRO; }
+function tryUnlock(code){
+  if(code.trim().toUpperCase()===INVITE_CODE.toUpperCase()){
+    PRO=true; localStorage.setItem('dmp_pro','1'); return true;
+  }
+  return false;
+}
+function lockPro(){ PRO=false; localStorage.removeItem('dmp_pro'); }
+function changeCode(newCode){
+  if(!newCode||newCode.trim().length<4) return false;
+  INVITE_CODE=newCode.trim().toUpperCase();
+  localStorage.setItem('dmp_code',INVITE_CODE);
+  return true;
+}
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════ */
+function gotoTab(id){
+  document.querySelectorAll('.screen').forEach(function(e){e.classList.remove('on');});
+  document.querySelectorAll('.tab').forEach(function(e){e.classList.remove('on');});
+  var sc=document.getElementById('sc-'+id);
+  if(sc) sc.classList.add('on');
+  var tb=document.getElementById('tab-'+id);
+  if(tb) tb.classList.add('on');
+  document.getElementById('scroll').scrollTop=0;
+  var renders={overview:renderOverview,trips:renderTrips,people:renderPeople,finance:renderFinance,docs:renderDocs,settings:renderSettings,help:renderHelp};
+  if(renders[id]) renders[id]();
+}
+
+/* ═══════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════ */
+function openModal(title,body,saveLabel,hideCancel){
+  document.getElementById('m-title').textContent=title;
+  document.getElementById('m-body').innerHTML=body;
+  document.getElementById('m-save').textContent=saveLabel||T('saved')||'儲存';
+  document.getElementById('m-save').style.display=saveLabel===false?'none':'';
+  document.getElementById('m-save').onclick=modalSave;
+  document.getElementById('m-cancel').textContent=T('cancel')||'取消';
+  document.getElementById('m-cancel').style.display=hideCancel?'none':'';
+  document.getElementById('modal-bg').classList.add('on');
+}
+function closeModal(){ document.getElementById('modal-bg').classList.remove('on'); }
+
+/* ═══════════════════════════════════════════
+   OVERVIEW
+═══════════════════════════════════════════ */
+function renderOverview(){
+  var ft=DB.trips[0];
+  var fps=ft?DB.people.filter(function(p){return p.tid===ft.id;}).slice(0,4):[];
+  var fe=ft?DB.expenses.filter(function(e){return e.tid===ft.id;}):[]; 
+  var fc2=ft?DB.checklist.filter(function(c){return c.tid===ft.id;}):[]; 
+  var doneC=fc2.filter(function(c){return c.done;}).length;
+  var totalCost=fe.reduce(function(a,e){return a+e.amt;},0);
+  var totalDue=DB.people.reduce(function(a,p){return a+Math.max(p.due-p.paid,0);},0);
+  var od=DB.people.filter(function(p){return p.paid===0&&p.due>0;}).length;
+  var activeT=DB.trips.filter(function(t){return t.status==='active';}).length;
+  var docData=[
+    {k:'insuranceDAN',l:T('docCats')||'DAN',e:'🛡️',bg:'#E1F5EE',c:'#085041'},
+    {k:'certCards',l:'',e:'🪪',bg:'#E6F1FB',c:'#0C447C'},
+    {k:'medicalForms',l:'',e:'🏥',bg:'#FAEEDA',c:'#633806'},
+    {k:'flightDetails',l:'',e:'✈️',bg:'#FCEBEB',c:'#791F1F'}
+  ];
+  var h='';
+  h+='<div class="ph"><div><div class="t-h1">'+T('overview')+'</div><div class="t-small" style="margin-top:3px">'+DB.trips.filter(function(t){return t.status!=='completed';}).length+(LG==='zh'?' 個進行中旅程':' active trips')+'</div></div></div>';
+  /* Metrics */
+  h+='<div class="metric-grid">';
+  h+='<div class="metric"><div class="metric-lbl">'+T('activeTrips')+'</div><div class="metric-val">'+activeT+'</div></div>';
+  h+='<div class="metric"><div class="metric-lbl">'+T('participants')+'</div><div class="metric-val">'+DB.people.length+'</div></div>';
+  h+='<div class="metric"><div class="metric-lbl">'+T('paymentsDue')+'</div><div class="metric-val" style="font-size:18px">'+fc(totalDue)+'</div>'+(od>0?'<div class="metric-sub" style="color:#E24B4A">'+od+(LG==='zh'?' 筆逾期':' overdue')+'</div>':'')+'</div>';
+  h+='<div class="metric"><div class="metric-lbl">'+T('totalExpenses')+'</div><div class="metric-val" style="font-size:18px">'+fc(totalCost)+'</div></div>';
+  h+='</div>';
+  /* Upcoming trips */
+  h+='<div class="section-head"><div class="t-h2">'+T('upcomingTrips')+'</div><div class="section-action" onclick="gotoTab(\'trips\')">'+T('viewAll')+'</div></div>';
+  if(!DB.trips.length){ h+='<div class="empty">'+T('noTrips').replace('\n','<br>')+'</div>'; }
+  else{ DB.trips.slice(0,3).forEach(function(t){ var dc=DB.people.filter(function(p){return p.tid===t.id;}).length; h+='<div class="card card-press" onclick="gotoTab(\'trips\')"><div class="row gap12"><div style="width:42px;height:42px;border-radius:10px;background:'+(t.status==='active'?'#E6F1FB':'#f5f5f3')+';display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">'+tripTypeLabel(t.tripType).slice(0,2)+'</div><div style="flex:1;min-width:0"><div class="t-h3" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+t.name+'</div><div class="t-small" style="margin-top:2px">'+fd(t.dep)+' → '+fd(t.ret)+' · '+dc+(LG==='zh'?' 人':' pax')+'</div></div>'+badgeHtml(t.status)+'</div></div>'; }); }
+  /* Participants */
+  h+='<div class="section-head"><div class="t-h2">'+T('roster')+'</div><div class="section-action" onclick="gotoTab(\'people\')">'+T('manage')+'</div></div>';
+  h+='<div class="card">';
+  if(!fps.length){ h+='<div class="empty" style="padding:16px">'+T('noPeople').replace('\n','<br>')+'</div>'; }
+  else{ fps.forEach(function(p,i){ h+=(i>0?'<div class="divider"></div>':'')+'<div class="row gap12"><div>'+avHtml(p.name,32)+'</div><div class="t-body" style="flex:1">'+p.name+'</div><div class="t-xs" style="margin-right:6px">'+(TT('certLevels',p.cert)||p.cert).slice(0,3).toUpperCase()+'</div>'+badgeHtml(payStatus(p))+'</div>'; }); }
+  h+='</div>';
+  /* Checklist */
+  if(fc2.length){ h+='<div class="section-head"><div class="t-h2">'+T('checklist')+'</div></div><div class="card"><div class="t-small mb8">'+doneC+' / '+fc2.length+(LG==='zh'?' 項已確認':' done')+'</div>'; fc2.slice(0,5).forEach(function(c){ h+='<div class="row gap12" style="padding:6px 0;cursor:pointer" onclick="toggleCheck(\''+c.id+'\')"><div style="width:20px;height:20px;border-radius:5px;'+(c.done?'background:#1D9E75;':'border:2px solid #ddd;')+'display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(c.done?'<span style="color:#fff;font-size:11px;font-weight:700">✓</span>':'')+'</div><div class="t-body '+(c.done?'" style="text-decoration:line-through;color:#bbb':'')+'" style="flex:1">'+c.name+'</div></div>'; }); h+='</div>'; }
+  /* Docs */
+  h+='<div class="section-head"><div class="t-h2">'+T('insuranceDocs')+'</div><div class="section-action" onclick="gotoTab(\'docs\')">'+T('viewAll')+'</div></div><div class="card">';
+  docData.forEach(function(d){ var lbl=TT('docCats',d.k)||d.k; var sub=ft?DB.docs.filter(function(x){return x.tid===ft.id&&x.cat===d.k;}).length:0; h+='<div class="row gap12" style="padding:8px 10px;border-radius:8px;margin-bottom:6px;background:'+d.bg+'"><div style="font-size:18px">'+d.e+'</div><div style="flex:1"><div class="t-h3" style="color:'+d.c+'">'+lbl+'</div><div style="font-size:11px;color:'+d.c+';opacity:.75">'+sub+(LG==='zh'?' 份已提交':' submitted')+'</div></div></div>'; });
+  h+='</div>';
+  document.getElementById('sc-overview').innerHTML=h;
+}
+function toggleCheck(id){ var c=DB.checklist.find(function(x){return x.id===id;}); if(c){c.done=!c.done;saveDB();renderOverview();} }
+
+/* ═══════════════════════════════════════════
+   TRIPS
+═══════════════════════════════════════════ */
+function renderTrips(){
+  var h='<div class="ph"><div class="t-h1">'+T('trips')+'</div><button class="add-btn" onclick="openAddTrip()">+</button></div>';
+  if(!DB.trips.length){ h+='<div class="empty">'+T('noTrips').replace('\n','<br>')+'</div>'; }
+  else{ DB.trips.forEach(function(t){ var dc=DB.people.filter(function(p){return p.tid===t.id;}).length; h+='<div class="card"><div class="row-between mb8"><div style="flex:1;margin-right:8px"><div class="t-h2">'+t.name+'</div><div class="t-small" style="margin-top:3px">📍 '+t.dest+'</div></div>'+badgeHtml(t.status)+'</div><div class="divider"></div><div class="row gap12" style="margin-top:8px;flex-wrap:wrap"><span class="t-small">📅 '+fd(t.dep)+' → '+fd(t.ret)+'</span><span class="t-small">🤿 '+dc+(LG==='zh'?' 人':' pax')+'</span>'+(t.charter?'<span class="t-small">⚓ '+t.charter+'</span>':'')+'<span class="t-small">'+tripTypeLabel(t.tripType)+'</span>'+(t.focRule?(dc>0?'<span class="t-small">🎁 FOC: '+Math.floor(dc/t.focRule)+(LG==='zh'?'個':'')+'</span>':'<span class="t-small" style="color:#aaa">🎁 FOC規則: '+(LG==='zh'?'每'+t.focRule+'人送1':'1 free per '+t.focRule)+'</span>'):'')+'</div><div style="margin-top:10px"><button class="btn btn-danger btn-sm" onclick="deleteTrip(\''+t.id+'\')">🗑 '+(LG==='zh'?'刪除':'Delete')+'</button></div></div>'; }); }
+  document.getElementById('sc-trips').innerHTML=h;
+}
+function openEditTrip(id){
+  var t=DB.trips.find(function(x){return x.id===id;}); if(!t) return;
+  modalMode='editTrip'; selTripType=t.tripType||'liveaboard';
+  var zh=LG==='zh';
+  var types=[['liveaboard','🚢','船宿','Liveaboard'],['resort','🏝️','渡假村','Resort'],['daytrip','🤿','一日船潛','Day Trip']];
+  var typeHtml='<div class="trip-type-grid">';
+  types.forEach(function(tp){ var isOn=(tp[0]===selTripType); typeHtml+='<div id="tt-'+tp[0]+'" data-t="'+tp[0]+'" onclick="selTTypeEl(this)" class="trip-type-card'+(isOn?' on':'')+'"><div style="font-size:24px">'+tp[1]+'</div><div style="font-size:12px;font-weight:700;color:#555;margin-top:4px">'+(zh?tp[2]:tp[3])+'</div></div>'; });
+  typeHtml+='</div><input type="hidden" id="f-ttype" value="'+selTripType+'">';
+  var b='<input type="hidden" id="f-editid" value="'+id+'">';
+  b+='<div class="form-group"><label class="flabel">'+T('tripName')+' *</label><input class="finput" id="f-tname" type="text" value="'+t.name+'"></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('dest')+'</label><input class="finput" id="f-tdest" type="text" value="'+(t.dest||'')+'"></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('charter')+'</label><input class="finput" id="f-tcharter" type="text" value="'+(t.charter||'')+'"></div>';
+  b+='<div class="frow"><div class="form-group"><label class="flabel">'+T('dep')+'</label><input class="finput" id="f-tdep" type="date" value="'+(t.dep||'')+'"></div><div class="form-group"><label class="flabel">'+T('ret')+'</label><input class="finput" id="f-tret" type="date" value="'+(t.ret||'')+'"></div></div>';
+  b+='<div class="form-group"><label class="flabel">'+(zh?'行程類型':'Trip Type')+'</label>'+typeHtml+'</div>';
+  b+='<div class="frow"><div class="form-group"><label class="flabel">'+T('focRule')+'</label><input class="finput" id="f-tfoc" type="number" min="0" value="'+(t.focRule||0)+'"></div><div class="form-group"><label class="flabel">'+T('margin')+'</label><input class="finput" id="f-tmargin" type="number" min="0" value="'+(t.margin||20)+'"></div></div>';
+  openModal((zh?'編輯旅程':'Edit Trip'),b,zh?'儲存':'Save');
+}
+function deleteTrip(id){
+  if(!confirm(T('delTrip'))) return;
+  DB.trips=DB.trips.filter(function(t){return t.id!==id;});
+  DB.people=DB.people.filter(function(p){return p.tid!==id;});
+  DB.expenses=DB.expenses.filter(function(e){return e.tid!==id;});
+  DB.checklist=DB.checklist.filter(function(c){return c.tid!==id;});
+  DB.docs=DB.docs.filter(function(d){return d.tid!==id;});
+  saveDB(); renderTrips();
+}
+function openAddTrip(){
+  modalMode='addTrip'; selTripType='liveaboard';
+  var zh=LG==='zh';
+  var types=[['liveaboard','🚢','船宿','Liveaboard'],['resort','🏝️','渡假村','Resort'],['daytrip','🤿','一日船潛','Day Trip']];
+  var typeHtml='<div class="trip-type-grid">';
+  types.forEach(function(t){ typeHtml+='<div id="tt-'+t[0]+'" onclick="selTType(\''+t[0]+'\')" class="trip-type-card'+(t[0]==='liveaboard'?' on':'')+'"><div style="font-size:24px">'+t[1]+'</div><div style="font-size:12px;font-weight:700;color:#555;margin-top:4px">'+(zh?t[2]:t[3])+'</div></div>'; });
+  typeHtml+='</div><input type="hidden" id="f-ttype" value="liveaboard">';
+  var b='<div class="form-group"><label class="flabel">'+T('tripName')+' *</label><input class="finput" id="f-tname" type="text" placeholder=""></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('dest')+'</label><input class="finput" id="f-tdest" type="text"></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('charter')+'</label><input class="finput" id="f-tcharter" type="text"></div>';
+  b+='<div class="frow"><div class="form-group"><label class="flabel">'+T('dep')+'</label><input class="finput" id="f-tdep" type="date"></div><div class="form-group"><label class="flabel">'+T('ret')+'</label><input class="finput" id="f-tret" type="date"></div></div>';
+  b+='<div class="form-group"><label class="flabel">'+(zh?'行程類型':'Trip Type')+'</label>'+typeHtml+'</div>';
+  b+='<div class="frow"><div class="form-group"><label class="flabel">'+T('focRule')+'</label><input class="finput" id="f-tfoc" type="number" min="0" value="0"></div><div class="form-group"><label class="flabel">'+T('margin')+'</label><input class="finput" id="f-tmargin" type="number" min="0" value="20"></div></div>';
+  openModal(T('newTrip'),b,LG==='zh'?'儲存':'Save');
+}
+function selTType(t){
+  selTripType=t;
+  ['liveaboard','resort','daytrip'].forEach(function(x){ var el=document.getElementById('tt-'+x); if(el) el.classList.toggle('on',x===t); });
+  var fi=document.getElementById('f-ttype'); if(fi) fi.value=t;
+}
+function selTTypeEl(el){
+  var t=el.getAttribute('data-t');
+  if(t) selTType(t);
+}
+
+/* ═══════════════════════════════════════════
+   PEOPLE
+═══════════════════════════════════════════ */
+function renderPeople(){
+  if(!selTripId && DB.trips.length) selTripId=DB.trips[0].id;
+  var chips=DB.trips.map(function(t){return '<div class="chip'+(selTripId===t.id?' on':'')+'" onclick="selPeopleTrip(\''+t.id+'\')">'+t.name+'</div>';}).join('');
+  var ps=DB.people.filter(function(p){return p.tid===selTripId;});
+  var paidC=ps.filter(function(p){return payStatus(p)==='paid';}).length;
+  var partC=ps.filter(function(p){return payStatus(p)==='partial';}).length;
+  var pendC=ps.filter(function(p){return payStatus(p)==='pending';}).length;
+  var h='<div class="ph"><div class="t-h1">'+T('people')+'</div><div class="row gap8"><button class="btn btn-secondary btn-sm" onclick="openImportPeople()">'+T('importBtn2')+'</button><button class="add-btn" onclick="openAddPerson()">+</button></div></div>';
+  h+='<div class="chip-bar">'+chips+'</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">';
+  h+='<div class="metric" style="text-align:center"><div class="metric-lbl">'+T('paid')+'</div><div class="metric-val" style="color:#1D9E75">'+paidC+'</div></div>';
+  h+='<div class="metric" style="text-align:center"><div class="metric-lbl">'+T('partial')+'</div><div class="metric-val" style="color:#EF9F27">'+partC+'</div></div>';
+  h+='<div class="metric" style="text-align:center"><div class="metric-lbl">'+T('pending')+'</div><div class="metric-val" style="color:#E24B4A">'+pendC+'</div></div>';
+  h+='</div>';
+  if(!ps.length){ h+='<div class="empty">'+T('noPeople').replace('\n','<br>')+'</div>'; }
+  else{ ps.forEach(function(p){ var bal=p.due-p.paid; h+='<div class="card"><div class="row gap12 mb12">'+avHtml(p.name,42)+'<div style="flex:1"><div class="t-h3">'+p.name+'</div><div class="t-small" style="margin-top:2px">'+(TT('certLevels',p.cert)||p.cert)+' · '+p.org.toUpperCase()+(p.certNum?' · '+p.certNum:'')+'</div></div>'+badgeHtml(payStatus(p))+'</div><div class="divider"></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;margin-top:10px"><div><div class="t-xs">'+T('totalPaid')+'</div><div style="font-size:15px;font-weight:700;color:#1D9E75">'+fc(p.paid)+'</div></div><div><div class="t-xs">'+T('amtDue')+'</div><div style="font-size:15px;font-weight:700">'+fc(p.due)+'</div></div><div><div class="t-xs">'+T('balance')+'</div><div style="font-size:15px;font-weight:700;color:'+(bal>0?'#E24B4A':'#1D9E75')+'">'+fc(bal)+'</div></div></div>'+(p.email||p.passport?'<div class="t-small" style="margin-top:8px">'+(p.email?'✉ '+p.email+' ':'')+(p.passport?'🛂 '+p.passport:'')+'</div>':'')+'<div class="row gap8" style="margin-top:10px"><button class="btn btn-success btn-sm" style="flex:1" onclick="recPayPrompt(\''+p.id+'\')">💳 '+T('recordPay')+'</button><button class="btn btn-danger btn-sm" onclick="delPerson(\''+p.id+'\')">🗑</button></div></div>'; }); }
+  document.getElementById('sc-people').innerHTML=h;
+}
+function selPeopleTrip(id){ selTripId=id; renderPeople(); }
+function recPayPrompt(id){ var v=prompt(T('enterAmt')); if(!v) return; var n=parseFloat(v); if(isNaN(n)||n<=0) return; var p=DB.people.find(function(x){return x.id===id;}); if(p){p.paid=Math.min(p.paid+n,p.due);saveDB();renderPeople();} }
+function delPerson(id){ if(!confirm(T('delPerson'))) return; DB.people=DB.people.filter(function(p){return p.id!==id;}); saveDB(); renderPeople(); }
+
+function openAddPerson(){
+  modalMode='addPerson'; selCert='ow'; selOrg='padi';
+  if(!selTripId && DB.trips.length) selTripId=DB.trips[0].id;
+  var zh=LG==='zh';
+  var cl=Object.entries(S[LG].certLevels||S.en.certLevels);
+  var ol=Object.entries(S[LG].orgs||S.en.orgs);
+  var clH=cl.map(function(e){return '<div class="sel-opt'+(e[0]==='ow'?' on':'')+'" onclick="pickCert(\''+e[0]+'\',this)">'+e[1]+'</div>';}).join('');
+  var olH=ol.map(function(e){return '<div class="sel-opt'+(e[0]==='padi'?' on':'')+'" onclick="pickOrg(\''+e[0]+'\',this)">'+e[1]+'</div>';}).join('');
+  var scanNote='<div style="font-size:12px;color:#aaa;text-align:center;margin-top:-8px;margin-bottom:12px">'+T('scanHint')+'</div>';
+  var emailNote='<div style="font-size:12px;color:#aaa;margin-top:-10px;margin-bottom:14px">'+T('emailNote')+'</div>';
+  var b='';
+  b+='<button class="scan-btn" id="scan-main-btn" onclick="startScan()">'+T('scanBtn')+'</button>'+scanNote;
+  b+='<input type="file" id="scan-file-input" accept="image/*,.pdf" style="display:none" onchange="handleScanFile(this)">';
+  b+='<div id="scan-result-box" style="display:none" class="scan-result mb12"><div style="font-size:12px;font-weight:700;color:#085041;margin-bottom:4px">'+T('scanDone')+'</div><div id="scan-result-text" style="font-size:13px;color:#085041;white-space:pre-line"></div></div>';
+  b+='<div class="divider" style="margin-bottom:14px"></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('fullName')+' *</label><input class="finput" id="f-pname" type="text"><div id="fe-pname" class="form-error" style="display:none">'+T('fullName')+'</div></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('email')+'</label><input class="finput" id="f-pemail" type="email">'+emailNote+'</div>';
+  b+='<div class="form-group"><label class="flabel">'+T('phone')+'</label><input class="finput" id="f-pphone" type="tel"></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('passport')+'</label><input class="finput" id="f-ppassport" type="text"></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('certLevel')+'</label><div class="sel-grid" id="cert-pick">'+clH+'</div></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('certOrg')+'</label><div class="sel-grid" id="org-pick">'+olH+'</div></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('certNum')+'</label><input class="finput" id="f-pcertnum" type="text"></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('amtDue')+' ('+((CURR[CUR]||CURR.TWD).sym)+')</label><input class="finput" id="f-pdue" type="number" min="0" placeholder="0"></div>';
+  openModal(T('addPerson'),b,LG==='zh'?'儲存':'Save');
+}
+function pickCert(k,el){ selCert=k; document.querySelectorAll('#cert-pick .sel-opt').forEach(function(b){b.classList.remove('on');}); if(el) el.classList.add('on'); }
+function pickOrg(k,el){ selOrg=k; document.querySelectorAll('#org-pick .sel-opt').forEach(function(b){b.classList.remove('on');}); if(el) el.classList.add('on'); }
+
+/* ═══════════════════════════════════════════
+   AI SCAN
+═══════════════════════════════════════════ */
+function startScan(){ document.getElementById('scan-file-input').click(); }
+function handleScanFile(input){
+  var file=input.files[0]; if(!file) return;
+  var btn=document.getElementById('scan-main-btn');
+  if(btn){btn.textContent=T('scanning');btn.classList.add('scanning');btn.disabled=true;}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var base64=e.target.result.split(',')[1];
+    var mtype=file.type||'image/jpeg';
+    callClaudeOCR(base64,mtype,null,function(result,errType,errObj){
+      if(btn){btn.textContent=T('scanBtn');btn.classList.remove('scanning');btn.disabled=false;}
+      if(result) applyOCR(result);
+      else if(errType==='nokey') noApiKeyAlert();
+      else if(errType==='apierror') alert((LG==='zh'?'AI 錯誤：':'AI error: ')+(errObj&&errObj.message?errObj.message:JSON.stringify(errObj)));
+      else alert(T('scanFail'));
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ── Expense receipt/invoice/chat-screenshot scan (multi-item) ── */
+var scannedExpenseItems=[];
+function startExpenseScan(){ document.getElementById('exp-scan-file-input').click(); }
+function handleExpenseScanFile(input){
+  var file=input.files[0]; if(!file) return;
+  var btn=document.getElementById('exp-scan-btn');
+  if(btn){btn.textContent=T('scanning');btn.classList.add('scanning');btn.disabled=true;}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var base64=e.target.result.split(',')[1];
+    var mtype=file.type||'image/jpeg';
+    var targetLang=(LG==='zh'?'Traditional Chinese':'English');
+    var prompt='This image is a receipt, invoice, price quote, or chat screenshot about dive trip costs (any language e.g. Thai/English/Chinese). It may show MULTIPLE cost items (different boat/package options, or several fee line items). Extract ALL distinct cost items you can find as a JSON array. Each element: {"desc":"short description, translated to '+targetLang+' if needed","amount":0,"costType":"A","category":"other"}. amount = plain number, no currency symbols/commas; if a range like 1500-2000 is given, use the average. costType: "A" = a lump-sum TOTAL for the whole group/charter (e.g. boat charter price). "B" = an amount that is ALREADY per-person (text shows "/\u4eba","/pax","each","per person"). category must be exactly one of: charter, accommodation, equipment, gas, flights, insurance, food, transport, permits, other. Return ONLY a JSON array (even if just one item), no markdown, no explanation.';
+    callClaudeOCR(base64,mtype,prompt,function(result,errType,errObj){
+      if(btn){btn.textContent=T('expScanBtn');btn.classList.remove('scanning');btn.disabled=false;}
+      if(result) applyExpenseOCR(result);
+      else if(errType==='nokey') noApiKeyAlert();
+      else if(errType==='apierror') alert((LG==='zh'?'AI 錯誤：':'AI error: ')+(errObj&&errObj.message?errObj.message:JSON.stringify(errObj)));
+      else alert(T('scanFail'));
+    });
+  };
+  reader.readAsDataURL(file);
+}
+function applyExpenseOCR(r){
+  var items=Array.isArray(r)?r:[r];
+  items=items.filter(function(it){ return it&&it.amount&&Number(it.amount)>0; });
+  if(!items.length){ alert(T('scanFail')); return; }
+  scannedExpenseItems=items.map(function(it){
+    var allCats=['charter','accommodation','equipment','gas','flights','insurance','food','transport','permits','other'];
+    return {
+      desc:String(it.desc||catLabel('other')).trim(),
+      amount:Number(it.amount)||0,
+      costType:(it.costType==='B')?'B':'A',
+      category:(it.category&&allCats.indexOf(it.category)>=0)?it.category:'other',
+      checked:true
+    };
+  });
+  showScanReviewModal();
+}
+function showScanReviewModal(){
+  var zh=LG==='zh';
+  var b='<div class="t-small mb12">'+(zh?'偵測到 '+scannedExpenseItems.length+' 筆費用，請確認後新增（可取消勾選不需要的項目）：':'Detected '+scannedExpenseItems.length+' item(s). Review and uncheck any you don\'t want:')+'</div>';
+  scannedExpenseItems.forEach(function(it,i){
+    b+='<div class="card" style="margin-bottom:8px;padding:12px">';
+    b+='<div class="row gap8" style="align-items:flex-start">';
+    b+='<input type="checkbox" id="si-check-'+i+'" '+(it.checked?'checked':'')+' style="width:20px;height:20px;margin-top:10px;flex-shrink:0">';
+    b+='<div style="flex:1">';
+    b+='<input class="finput" id="si-desc-'+i+'" type="text" value="'+it.desc.replace(/"/g,'&quot;')+'" style="margin-bottom:8px">';
+    b+='<div class="frow">';
+    b+='<input class="finput" id="si-amt-'+i+'" type="number" min="0" value="'+it.amount+'">';
+    b+='<select class="finput" id="si-type-'+i+'" style="padding:12px 8px">';
+    b+='<option value="A"'+(it.costType==='A'?' selected':'')+'>'+(zh?'👥 總額':'👥 Total')+'</option>';
+    b+='<option value="B"'+(it.costType==='B'?' selected':'')+'>'+(zh?'🧍 每人':'🧍 Per-Person')+'</option>';
+    b+='</select>';
+    b+='</div>';
+    b+='<div class="t-xs" style="margin-top:4px">'+catLabel(it.category)+'</div>';
+    b+='</div></div></div>';
+  });
+  openModal(zh?'確認掃描結果':'Confirm Scanned Items', b, zh?'新增選中項目':'Add Selected');
+}
+function hasApiKey(){ return !!(API_KEY&&API_KEY.trim()); }
+function noApiKeyAlert(){
+  var zh=LG==='zh';
+  alert(zh?'尚未設定 AI 金鑰。請到 ⚙️ 設定 → AI 掃描設定 輸入你的 Anthropic API 金鑰才能使用掃描功能。':'No AI key set yet. Go to ⚙️ Settings → AI Scan Setup and enter your Anthropic API key to use scanning.');
+}
+function callClaudeOCR(base64,mtype,promptOverride,cb){
+  if(typeof promptOverride==='function'){ cb=promptOverride; promptOverride=null; }
+  if(!hasApiKey()){ cb(null,'nokey'); return; }
+  var prompt=promptOverride||'Extract info from this document image. Return ONLY valid JSON with these keys (empty string if not found): {"name":"","passport":"","certLevel":"","certOrg":"","certNum":"","email":"","phone":""}. certLevel: ow/aow/rescue/dm/instructor/tech/other. certOrg: padi/ssi/cmas/naui/bsac/other. Return JSON only, no explanation.';
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':API_KEY.trim(),
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:500,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mtype,data:base64}},{type:'text',text:prompt}]}]})
+  }).then(function(r){return r.json();}).then(function(data){
+    try{
+      if(data&&data.error){ cb(null,'apierror',data.error); return; }
+      var text=data.content[0].text.trim();
+      var sO=text.indexOf('{'), sA=text.indexOf('[');
+      var s=(sO>=0&&(sA<0||sO<sA))?sO:sA;
+      var closeCh=text[s]==='['?']':'}';
+      var e=text.lastIndexOf(closeCh);
+      if(s>=0&&e>s) cb(JSON.parse(text.slice(s,e+1)));
+      else cb(null);
+    }catch(err){cb(null);}
+  }).catch(function(err){cb(null,'fetcherror',err);});
+}
+function applyOCR(r){
+  var filled=[];
+  function sf(id,val,lbl){ if(val&&val.trim()){ var el=document.getElementById(id); if(el){el.value=val.trim();filled.push(lbl+': '+val.trim());} } }
+  sf('f-pname',r.name,LG==='zh'?'姓名':'Name');
+  sf('f-ppassport',r.passport,LG==='zh'?'護照':'Passport');
+  sf('f-pcertnum',r.certNum,LG==='zh'?'證照號碼':'Cert No.');
+  sf('f-pphone',r.phone,LG==='zh'?'電話':'Phone');
+  if(r.certLevel&&S[LG].certLevels[r.certLevel]){ pickCert(r.certLevel,null); var btns=document.querySelectorAll('#cert-pick .sel-opt'); var keys=Object.keys(S[LG].certLevels); btns.forEach(function(b,i){b.classList.toggle('on',keys[i]===r.certLevel);}); filled.push((LG==='zh'?'證照等級':'Cert')+': '+S[LG].certLevels[r.certLevel]); }
+  if(r.certOrg&&S[LG].orgs[r.certOrg]){ pickOrg(r.certOrg,null); var obtns=document.querySelectorAll('#org-pick .sel-opt'); var okeys=Object.keys(S[LG].orgs); obtns.forEach(function(b,i){b.classList.toggle('on',okeys[i]===r.certOrg);}); filled.push((LG==='zh'?'機構':'Org')+': '+r.certOrg.toUpperCase()); }
+  var rb=document.getElementById('scan-result-box'); var rt=document.getElementById('scan-result-text');
+  if(rb&&rt&&filled.length){ rt.textContent=filled.join('\n'); rb.style.display='block'; }
+  else if(filled.length===0){ alert(T('scanFail')); }
+}
+
+/* ═══════════════════════════════════════════
+   FINANCE
+═══════════════════════════════════════════ */
+function renderFinance(){
+  if(!selTripId && DB.trips.length) selTripId=DB.trips[0].id;
+  var chips=DB.trips.map(function(t){return '<div class="chip'+(selTripId===t.id?' on':'')+'" onclick="selFinTrip(\''+t.id+'\')">'+t.name+'</div>';}).join('');
+  var tid=selTripId;
+  var exps=DB.expenses.filter(function(e){return e.tid===tid;});
+  var trip=DB.trips.find(function(t){return t.id===tid;})||{};
+  var ps=DB.people.filter(function(p){return p.tid===tid;});
+  var col=ps.reduce(function(a,p){return a+p.paid;},0);
+  var ost=ps.reduce(function(a,p){return a+Math.max(p.due-p.paid,0);},0);
+  var h='<div class="ph"><div class="t-h1">'+T('finance')+'</div><div class="row gap8"><button class="btn btn-secondary btn-sm" onclick="exportTripPDF()" style="padding:8px 12px">📄 PDF</button><button class="add-btn" onclick="openAddExpense()">+</button></div></div>';
+  h+='<div class="chip-bar">'+chips+'</div>';
+  /* Stats */
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">';
+  h+='<div class="metric" style="text-align:center"><div class="metric-lbl">'+T('collected')+'</div><div class="metric-val" style="font-size:18px;color:#1D9E75">'+fc(col)+'</div></div>';
+  h+='<div class="metric" style="text-align:center"><div class="metric-lbl">'+T('outstanding')+'</div><div class="metric-val" style="font-size:18px;color:#E24B4A">'+fc(ost)+'</div></div>';
+  h+='</div>';
+  /* PRO: Pricing Calculator */
+  if(isPro()){
+    var actualPax=ps.length;
+    var pi=trip.pricingInputs||{};
+    var coachCount=(pi.coaches!==undefined)?pi.coaches:(trip.coachCount||0);
+    var focRule=(pi.focrule!==undefined)?pi.focrule:(trip.focRule||0);
+    var totalPaxVal=(pi.totalpax!==undefined)?pi.totalpax:actualPax;
+    var marginVal=(pi.margin!==undefined)?pi.margin:(trip.margin||20);
+    var autoFoc0=focRule>0?Math.floor(totalPaxVal/focRule):0;
+    var extraCoach0=Math.max(coachCount-autoFoc0,0);
+    var autoPayingCalc=Math.max(totalPaxVal-coachCount,0);
+    /* Detect stale "1" leftover from old fallback logic and recompute */
+    var payingVal=(pi.paying!==undefined && !(pi.paying===1 && autoPayingCalc!==1)) ? pi.paying : autoPayingCalc;
+    var vb=function(n){ return (n===0||n===undefined||n===null||isNaN(n))?'':n; };
+    var zh3=LG==='zh';
+    var iS="width:80px;padding:8px;border-radius:8px;border:1px solid #ddd;font-size:14px;font-weight:600;text-align:right;font-family:inherit";
+    h+='<div class="card mb12" style="border:1px solid #185FA5">';
+    h+='<div class="row-between mb12"><div class="t-h2">🧮 '+T('pricingCalc')+'</div><span style="font-size:12px;color:#185FA5;font-weight:600" onclick="showWelcomeModal()">'+(zh3?'📖 使用說明':'📖 Guide')+'</span></div>';
+    if(actualPax>0){ h+='<div style="background:#E1F5EE;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:#085041">'+T('autoLoadedPax')+actualPax+T('people_unit')+'</div>'; }
+    h+='<div style="background:#f5f5f3;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#666;line-height:1.8">';
+    h+=zh3?'填入以下資訊，再按「立即計算」：':'Fill in the fields below, then tap Calculate:';
+    h+='</div>';
+    h+='<div class="row-between" style="margin-bottom:4px"><span class="t-body" style="font-weight:600">'+(zh3?'① 總人數':'① Total Pax')+'</span><input id="pi-totalpax" type="number" min="0" max="500" value="'+vb(totalPaxVal)+'" oninput="savePricingInput(\''+tid+'\')" style="'+iS+'"></div>';
+    h+='<div class="t-xs mb10" style="padding-left:2px">'+(zh3?'出發的所有人，包含教練和學員':'Everyone going, including coaches and students')+'</div>';
+    h+='<div class="row-between" style="margin-bottom:4px"><span class="t-body" style="font-weight:600">'+(zh3?'② FOC規則（幾人送1）':'② FOC Rule (every N = 1 free)')+'</span><input id="pi-focrule" type="number" min="0" max="100" value="'+vb(focRule)+'" oninput="savePricingInput(\''+tid+'\')" style="'+iS+'"></div>';
+    h+='<div class="t-xs mb10" style="padding-left:2px">'+(zh3?'船公司條件，例如10送1就填10；沒有FOC填0':'e.g. enter 10 for "1 free per 10". Enter 0 if no FOC.')+'</div>';
+    var focColor=extraCoach0>0?'#FAEEDA':'#E6F1FB'; var focTextColor=extraCoach0>0?'#633806':'#0C447C';
+    h+='<div id="foc-preview" style="background:'+focColor+';border-radius:8px;padding:10px;margin-bottom:12px;font-size:13px;color:'+focTextColor+'">🎁 FOC: <b>'+autoFoc0+(zh3?' 個':' slots')+'</b>'+(extraCoach0>0?' <span style="color:#633806">⚠️ '+extraCoach0+(zh3?' 位超額教練，費用由付費團員分攤':' extra coach(es), cost split by paying members')+'</span>':'<span style="color:#085041"> ✅ '+(zh3?'名額足夠':'Enough FOC')+'</span>')+'</div>';
+    h+='<div class="row-between" style="margin-bottom:4px"><span class="t-body" style="font-weight:600">'+(zh3?'③ 免費教練總人數':'③ Total Free Coaches')+'</span><input id="pi-coaches" type="number" min="0" max="50" value="'+vb(coachCount)+'" oninput="savePricingInput(\''+tid+'\')" style="'+iS+'"></div>';
+    h+='<div class="t-xs mb10" style="padding-left:2px">'+(zh3?'所有不付費的教練人數（包含有FOC和超額的）':'All coaches who do not pay — including FOC and extra ones')+'</div>';
+    h+='<div class="row-between" style="margin-bottom:4px"><span class="t-body" style="font-weight:600;color:#185FA5">'+(zh3?'④ 要付錢的團員人數':'④ Paying Members')+'</span><input id="pi-paying" type="number" min="1" max="500" value="'+vb(payingVal)+'" oninput="savePricingInput(\''+tid+'\')" style="'+iS+';border:2px solid #185FA5;background:#EEF5FF"></div>';
+    h+='<div class="t-xs mb12" style="padding-left:2px;color:#185FA5">'+(zh3?'= 總人數 - 免費教練 = 需要分攤費用的人數。可手動調整。':'= Total pax minus free coaches = people splitting the cost. Editable.')+'</div>';
+    h+='<div class="row-between" style="margin-bottom:12px"><span class="t-body" style="font-weight:600">'+(zh3?'⑤ 目標利潤率 %':'⑤ Target Margin %')+'</span><input id="pi-margin" type="number" min="0" max="200" value="'+vb(marginVal)+'" oninput="savePricingInput(\''+tid+'\')" style="'+iS+'"></div>';
+    h+='<div class="t-xs mb12" style="padding-left:2px;margin-top:-10px">'+(zh3?'例如填20，代表收費比成本多20%':'e.g. 20 means charge 20% above cost')+'</div>';
+    h+='<button onclick="calcPricing(\''+tid+'\')" class="btn btn-primary btn-full mb12">'+T('calcBtn')+'</button>';
+    h+='<div id="pricing-result"></div>';
+    h+='</div>';
+    /* ── TWD conversion section (only if CUR is not TWD) ── */
+    if(true){
+      var fxRate=trip.fxRate||(RATES_TO_TWD[CUR]||1);
+      var targetCur=trip.convTargetCur||'TWD';
+      h+='<div class="card mb12" style="border:1px solid #EF9F27">';
+      h+='<div class="t-h2 mb8">💱 '+(zh3?'換算成其他幣別（手動，最後結算用）':'Convert to Another Currency (manual, for final settlement)')+'</div>';
+      h+='<div class="t-small mb10">'+(zh3?'以上計算結果是用 '+CUR+' 顯示。選擇目標幣別、輸入匯率後按「換算」，才會顯示換算金額。':'Results above are shown in '+CUR+'. Pick a target currency, enter a rate, then tap Convert.')+'</div>';
+      h+='<div class="form-group"><label class="flabel">'+(zh3?'換算成':'Convert To')+'</label><select id="pi-targetcur" class="finput" onchange="onTargetCurChange(\''+tid+'\')" style="padding:12px 8px">';
+      Object.entries(CURR).forEach(function(c){ h+='<option value="'+c[0]+'"'+(c[0]===targetCur?' selected':'')+'>'+c[1].sym+' '+c[1].name+'</option>'; });
+      h+='</select></div>';
+      h+='<div class="row-between mb10"><span class="t-body">1 '+CUR+' = ? '+targetCur+'</span><input id="pi-fxrate" type="number" min="0" step="0.001" value="'+fxRate+'" oninput="savePricingInput(\''+tid+'\')" style="'+iS+';width:100px"></div>';
+      h+='<div class="t-xs mb8" style="color:#633806">'+(zh3?'以下每筆為「總金額」，系統自動 ÷ 付費人數算入每人售價（例：機票每人'+targetCur+'17,000 × 24人 = 408,000）':'Each item is a TOTAL amount — auto ÷ paying pax into per-person price (e.g. flight 17,000/pax × 24 pax = 408,000)')+'</div>';
+      var extras=trip.twdExtras||[];
+      h+='<div id="twd-extras-list">';
+      extras.forEach(function(ex,xi){
+        h+='<div class="frow" style="margin-bottom:8px">';
+        var exDescEsc=(ex.desc||'').split('"').join('&quot;');
+        h+='<div class="form-group" style="flex:2"><input class="finput" placeholder="'+(zh3?'項目名稱':'Item name')+'" value="'+exDescEsc+'" oninput="updateTwdExtra(\''+tid+'\','+xi+',\'desc\',this.value)"></div>';
+        h+='<div class="form-group" style="flex:1"><input class="finput" type="number" min="0" placeholder="0" value="'+vb(ex.amt)+'" oninput="updateTwdExtra(\''+tid+'\','+xi+',\'amt\',this.value)"></div>';
+        h+='<button class="btn btn-danger btn-sm" style="height:44px;margin-top:20px;flex-shrink:0" onclick="removeTwdExtra(\''+tid+'\','+xi+')">✕</button>';
+        h+='</div>';
+      });
+      h+='</div>';
+      h+='<button class="btn btn-secondary btn-full mb8" onclick="addTwdExtra(\''+tid+'\')">＋ '+(zh3?'新增項目':'Add Item')+'</button>';
+      h+='<button onclick="convertToTWD(\''+tid+'\')" class="btn btn-secondary btn-full mb12">💱 '+(zh3?'換算':'Convert')+'</button>';
+      h+='<div id="twd-result"></div>';
+      h+='</div>';
+    }
+  } else {
+    h+='<div class="pro-gate"><div style="font-size:36px;margin-bottom:10px">🔐</div>';
+    h+='<div class="t-h3 mb8">'+T('proGateTitle')+'</div>';
+    h+='<div class="t-small mb12">'+T('proGateDesc')+'</div>';
+    h+='<button class="btn btn-primary" onclick="showUnlockModal()">'+T('unlockBtn')+'</button></div>';
+  }
+  /* Expenses list */
+  h+='<div class="section-head"><div class="t-h2">'+(LG==='zh'?'費用記錄':'Expenses')+'</div></div>';
+  h+='<div class="card">';
+  if(!exps.length){ h+='<div class="empty" style="padding:16px">'+T('noExpenses')+'</div>'; }
+  else{
+    var rev=[].concat(exps).reverse();
+    rev.forEach(function(e,i){
+      var typeBadge=e.costType==='B'?'<span class="badge b-blue" style="font-size:10px;margin-left:4px">'+T('typeB')+'</span>':'<span class="badge b-green" style="font-size:10px;margin-left:4px">'+T('typeA')+'</span>';
+      var eCur=e.curr||CUR; var eSym=(CURR[eCur]||CURR.TWD).sym; var amtDisp=eSym+Math.round(e.amt).toLocaleString()+(eCur!==CUR?' <span class="t-xs">('+eCur+')</span>':''); h+=(i>0?'<div class="divider"></div>':'')+'<div class="row-between" style="padding:8px 0"><div style="flex:1"><div class="t-body">'+e.desc+typeBadge+'</div><div class="t-xs" style="margin-top:2px">'+catLabel(e.cat)+' · '+e.date+'</div></div><div class="row gap8"><span class="t-body" style="font-weight:600">'+amtDisp+'</span><button class="btn btn-danger btn-sm" onclick="delExpense(\''+e.id+'\')">✕</button></div></div>';
+    });
+  }
+  h+='</div>';
+  document.getElementById('sc-finance').innerHTML=h;
+  /* Restore saved pricing result and TWD conversion on page load */
+  if(isPro()){
+    if(trip.pricingResult) renderPricingResult(trip.pricingResult);
+    if(trip.twdResult && trip.pricingResult) convertToTWD(tid);
+  }
+}
+function selFinTrip(id){ selTripId=id; renderFinance(); }
+function delExpense(id){ if(!confirm(T('delExp'))) return; DB.expenses=DB.expenses.filter(function(e){return e.id!==id;}); saveDB(); renderFinance(); }
+
+function addTwdExtra(tid){
+  var trip=DB.trips.find(function(t){return t.id===tid;}); if(!trip) return;
+  if(!trip.twdExtras) trip.twdExtras=[];
+  trip.twdExtras.push({desc:'',amt:0});
+  saveDB(); renderFinance();
+}
+function removeTwdExtra(tid,xi){
+  var trip=DB.trips.find(function(t){return t.id===tid;}); if(!trip) return;
+  if(trip.twdExtras) trip.twdExtras.splice(xi,1);
+  saveDB(); renderFinance();
+}
+function updateTwdExtra(tid,xi,field,val){
+  var trip=DB.trips.find(function(t){return t.id===tid;}); if(!trip) return;
+  if(!trip.twdExtras||!trip.twdExtras[xi]) return;
+  if(field==='amt') trip.twdExtras[xi].amt=parseFloat(val)||0;
+  else trip.twdExtras[xi].desc=val;
+  saveDB();
+}
+function onTargetCurChange(tid){
+  var trip=DB.trips.find(function(t){return t.id===tid;}); if(!trip) return;
+  var targetEl=document.getElementById('pi-targetcur');
+  if(!targetEl) return;
+  var target=targetEl.value;
+  trip.convTargetCur=target;
+  /* Suggest a default rate: CUR -> target via TWD as common base */
+  var curToTwd=RATES_TO_TWD[CUR]||1;
+  var targetToTwd=RATES_TO_TWD[target]||1;
+  var suggestedRate=target===CUR?1:(target==='TWD'?curToTwd:(curToTwd/targetToTwd));
+  trip.fxRate=Math.round(suggestedRate*1000)/1000;
+  trip.twdResult=null;
+  saveDB();
+  renderFinance(); /* full re-render so rate label / extra-cost labels reflect new target currency */
+}
+function savePricingInput(tid){
+  var trip=DB.trips.find(function(t){return t.id===tid;}); if(!trip) return;
+  var get=function(id){ var el=document.getElementById(id); return el?el.value:undefined; };
+  var pi=trip.pricingInputs||{};
+  var totalEl=document.getElementById('pi-totalpax');
+  var focEl=document.getElementById('pi-focrule');
+  var coachEl=document.getElementById('pi-coaches');
+  var payingEl=document.getElementById('pi-paying');
+  var marginEl=document.getElementById('pi-margin');
+  if(totalEl) pi.totalpax=parseInt(totalEl.value)||0;
+  if(focEl) pi.focrule=parseInt(focEl.value)||0;
+  if(coachEl) pi.coaches=parseInt(coachEl.value)||0;
+  if(payingEl) pi.paying=parseInt(payingEl.value)||0;
+  if(marginEl) pi.margin=parseFloat(marginEl.value)||0;
+  trip.pricingInputs=pi;
+  var fxEl=document.getElementById('pi-fxrate');
+  var targetEl=document.getElementById('pi-targetcur');
+  if(fxEl) trip.fxRate=parseFloat(fxEl.value)||0;
+  if(targetEl) trip.convTargetCur=targetEl.value||'TWD';
+  saveDB();
+  /* live-update FOC preview without losing input focus */
+  var totalPax=pi.totalpax||0, focRule=pi.focrule||0, coachCount=pi.coaches||0;
+  var autoFoc=focRule>0?Math.floor(totalPax/focRule):0;
+  var extraCoach=Math.max(coachCount-autoFoc,0);
+  var focBox=document.getElementById('foc-preview');
+  if(focBox){
+    var zh4=LG==='zh';
+    focBox.innerHTML='🎁 FOC: <b>'+autoFoc+(zh4?' 個':' slots')+'</b>'+(extraCoach>0?' <span style="color:#633806">⚠️ '+extraCoach+(zh4?' 位超額教練，費用由付費團員分攤':' extra coach(es), cost split by paying members')+'</span>':'<span style="color:#085041"> ✅ '+(zh4?'名額足夠':'Enough FOC')+'</span>');
+    focBox.style.background=extraCoach>0?'#FAEEDA':'#E6F1FB';
+    focBox.style.color=extraCoach>0?'#633806':'#0C447C';
+  }
+}
+
+function calcPricing(tid){
+  var trip=DB.trips.find(function(t){return t.id===tid;})||{};
+  var ps=DB.people.filter(function(p){return p.tid===tid;});
+  var actualPax=ps.length;
+  savePricingInput(tid);
+  var pi=trip.pricingInputs||{};
+  var totalPax=pi.totalpax||actualPax||0;
+  var focRule=pi.focrule||0;
+  var coachCount=pi.coaches||0;
+  var margin=pi.margin||20;
+  var autoFoc=focRule>0?Math.floor(totalPax/focRule):0;
+  var extraCoach=Math.max(coachCount-autoFoc,0);
+  var paying=pi.paying>0?pi.paying:Math.max(totalPax-coachCount,1);
+  var exps=DB.expenses.filter(function(e){return e.tid===tid;});
+  /* A = Total amount, shared by group, divided by paying pax */
+  var costA=exps.filter(function(e){return e.costType==='A'||!e.costType;}).reduce(function(a,e){return a+e.amt;},0);
+  /* B = Per-person amount, already per-person, summed directly (not divided) */
+  var costBPerPerson=exps.filter(function(e){return e.costType==='B';}).reduce(function(a,e){return a+e.amt;},0);
+  var perPersonCost=(costA/paying)+costBPerPerson;
+  var totalCost=costA+(costBPerPerson*paying);
+  var suggested=margin<100?perPersonCost/(1-margin/100):perPersonCost*2;
+  var revenue=suggested*paying;
+  var profit=revenue-totalCost;
+  var profitPct=revenue>0?(profit/revenue*100):0;
+  var coachProfit=coachCount>0&&profit>0?profit/coachCount:profit;
+  var breakEven=perPersonCost;
+  var result={costA:costA,costBPerPerson:costBPerPerson,totalCost:totalCost,perPersonCost:perPersonCost,suggested:suggested,profit:profit,profitPct:profitPct,coachProfit:coachProfit,breakEven:breakEven,paying:paying,coachCount:coachCount,autoFoc:autoFoc,extraCoach:extraCoach,cur:CUR};
+  trip.pricingResult=result; saveDB();
+  renderPricingResult(result);
+  /* clear stale TWD result since base numbers changed */
+  var twdEl=document.getElementById('twd-result'); if(twdEl) twdEl.innerHTML='';
+  trip.twdResult=null; saveDB();
+}
+
+function renderPricingResult(r){
+  var el=document.getElementById('pricing-result');
+  if(!el||!r) return;
+  var zh=LG==='zh';
+  var good=r.profitPct>=20,ok=r.profitPct>=5;
+  var statusColor=good?'#1D9E75':ok?'#EF9F27':'#E24B4A';
+  var statusLabel=good?T('healthy'):ok?T('low'):T('loss');
+  el.innerHTML=
+    '<div style="background:#f5f5f3;border-radius:10px;padding:12px;margin-bottom:10px;font-size:13px;line-height:2;color:#555">'+
+    '👥 '+(zh?'總額類（÷'+r.paying+'人）':'Total-type (÷'+r.paying+' pax)')+': <b>'+fc(r.costA)+'</b> → '+fc(r.costA/r.paying)+(zh?'/人':'/pax')+'<br>'+
+    '🧍 '+(zh?'每人金額類（直接加總）':'Per-person type (added directly)')+': <b>'+fc(r.costBPerPerson)+'</b>'+(zh?'/人':'/pax')+'<br>'+
+    '📊 '+(zh?'每人總費用':'Total per person')+': <b>'+fc(r.perPersonCost)+'</b><br>'+
+    '📦 '+(zh?'全團總成本':'Total Group Cost')+': <b>'+fc(r.totalCost)+'</b></div>'+
+    '<div class="pricing-result-grid">'+
+    '<div class="pricing-box" style="background:#E1F5EE"><div class="pricing-box-val" style="color:#085041">'+fc(r.suggested)+'</div><div class="pricing-box-lbl" style="color:#085041">'+T('suggestedPrice')+'</div></div>'+
+    '<div class="pricing-box" style="background:#E6F1FB"><div class="pricing-box-val" style="color:#0C447C">'+fc(r.breakEven)+'</div><div class="pricing-box-lbl" style="color:#0C447C">'+T('breakEven')+'</div></div>'+
+    '<div class="pricing-box" style="background:#f5f5f3"><div class="pricing-box-val">'+(r.coachCount>0?fc(r.coachProfit):fc(r.profit))+'</div><div class="pricing-box-lbl">'+(r.coachCount>0?T('coachProfit'):T('netProfit'))+'</div></div>'+
+    '<div class="pricing-box" style="background:#f5f5f3"><div class="pricing-box-val">'+Math.round(r.profitPct)+'%</div><div class="pricing-box-lbl">'+T('profitMargin')+'</div></div>'+
+    '</div>'+
+    '<div style="padding:10px 14px;background:'+statusColor+';border-radius:10px;color:#fff;display:flex;align-items:center;justify-content:space-between">'+
+    '<span style="font-size:14px;font-weight:700">'+statusLabel+'</span>'+
+    '<span style="font-size:12px">'+r.paying+(zh?' 人付費':' paying')+' · '+(r.cur||CUR)+'</span>'+
+    '</div>';
+}
+
+function convertToTWD(tid){
+  var trip=DB.trips.find(function(t){return t.id===tid;}); if(!trip) return;
+  savePricingInput(tid);
+  var r=trip.pricingResult;
+  var el=document.getElementById('twd-result');
+  if(!el) return;
+  var zh=LG==='zh';
+  if(!r){ el.innerHTML='<div class="t-small" style="color:#E24B4A">'+(zh?'請先按「立即計算」':'Please tap Calculate first')+'</div>'; return; }
+  var rate=trip.fxRate||1;
+  var target=trip.convTargetCur||'TWD';
+  var tSym=(CURR[target]||CURR.TWD).sym;
+  var extras=trip.twdExtras||[];
+  var twdExtras=extras.reduce(function(a,ex){return a+(ex.amt||0);},0);
+  var totalCostT=r.totalCost*rate+twdExtras;
+  var suggestedT=r.suggested*rate + (r.paying>0?twdExtras/r.paying:0);
+  var revenueT=suggestedT*r.paying;
+  var profitT=revenueT-totalCostT;
+  var profitPctT=revenueT>0?(profitT/revenueT*100):0;
+  var coachProfitT=r.coachCount>0&&profitT>0?profitT/r.coachCount:profitT;
+  var fmtT=function(n){ return tSym+Math.round(n).toLocaleString(); };
+  el.innerHTML=
+    '<div style="background:#fff8e6;border-radius:10px;padding:12px;margin-top:8px">'+
+    '<div class="t-h3 mb8">💱 '+(zh?target+' 換算結果':target+' Conversion Result')+'</div>'+
+    '<div style="font-size:13px;color:#633806;line-height:2">'+
+    (zh?'原始總成本 × 匯率':'Original cost × rate')+' = '+fc(r.totalCost)+' × '+rate+' = <b>'+fmtT(r.totalCost*rate)+'</b><br>'+
+    (twdExtras>0?
+      (extras.map(function(ex){ return '• '+(ex.desc||'—')+': '+fmtT(ex.amt||0); }).join('<br>')+'<br>'+(zh?'小計':'Subtotal')+' = <b>'+fmtT(twdExtras)+'</b><br>'):'')+
+    '<b>'+(zh?target+' 總成本':'Total Cost ('+target+')')+' = '+fmtT(totalCostT)+'</b></div>'+
+    '<div class="pricing-result-grid" style="margin-top:10px">'+
+    '<div class="pricing-box" style="background:#E1F5EE"><div class="pricing-box-val" style="color:#085041">'+fmtT(suggestedT)+'</div><div class="pricing-box-lbl" style="color:#085041">'+T('suggestedPrice')+' ('+target+')</div></div>'+
+    '<div class="pricing-box" style="background:#f5f5f3"><div class="pricing-box-val">'+(r.coachCount>0?fmtT(coachProfitT):fmtT(profitT))+'</div><div class="pricing-box-lbl">'+(r.coachCount>0?T('coachProfit'):T('netProfit'))+' ('+target+')</div></div>'+
+    '</div>'+
+    '<div class="t-xs mt4">'+(zh?'利潤率約 '+Math.round(profitPctT)+'%':'~'+Math.round(profitPctT)+'% margin')+'</div>'+
+    '</div>';
+  trip.twdResult={rate:rate,twdExtras:twdExtras,target:target}; saveDB();
+}
+
+function openAddExpense(){
+  if(!selTripId && DB.trips.length) selTripId=DB.trips[0].id;
+  modalMode='addExpense'; selExpCat='charter'; selCostType='A';
+  var zh=LG==='zh';
+  var trip=DB.trips.find(function(t){return t.id===selTripId;})||{};
+  var depDate=trip.dep||new Date().toISOString().slice(0,10);
+  var cats=Object.entries(S[LG].cats||S.en.cats);
+  var catH=cats.map(function(c){return '<div class="sel-opt'+(c[0]==='charter'?' on':'')+'" data-cat="'+c[0]+'" onclick="pickExpCat(\''+c[0]+'\',this)">'+c[1]+'</div>';}).join('');
+  var b='';
+  b+='<div class="form-group"><label class="flabel">'+T('expCat')+'</label><div class="sel-grid" id="exp-cat-pick">'+catH+'</div></div>';
+  b+='<div class="cost-type-grid">';
+  b+='<div class="cost-type-card on" id="ct-A" onclick="pickCostType(\'A\')"><div style="font-size:22px">👥</div><div style="font-size:13px;font-weight:700;margin-top:6px;color:#555">'+(zh?'總額':'Total Amount')+'</div><div style="font-size:11px;color:#aaa;margin-top:3px">'+(zh?'整團共用一筆，系統會÷付費人數':'Shared by group, divided by paying pax')+'</div></div>';
+  b+='<div class="cost-type-card" id="ct-B" onclick="pickCostType(\'B\')"><div style="font-size:22px">🧍</div><div style="font-size:13px;font-weight:700;margin-top:6px;color:#555">'+(zh?'每人金額':'Per-Person Amount')+'</div><div style="font-size:11px;color:#aaa;margin-top:3px">'+(zh?'這金額已是每人要付的，直接加總不再除':'Already a per-person amount, added directly')+'</div></div>';
+  b+='</div><input type="hidden" id="f-costtype" value="A">';
+  b+='<div class="form-group"><label class="flabel">'+T('expDesc')+'</label><input class="finput" id="f-edesc" type="text" value="'+(S[LG].cats?S[LG].cats.charter:S.en.cats.charter)+'"></div>';
+  b+='<div class="frow"><div class="form-group"><label class="flabel">'+T('expAmt')+' ('+(CURR[CUR]||CURR.TWD).sym+' '+CUR+')</label><input class="finput" id="f-eamt" type="number" min="0" inputmode="numeric" placeholder="0"></div><div class="form-group"><label class="flabel">'+T('expDate')+'</label><input class="finput" id="f-edate" type="date" value="'+depDate+'"></div></div>';
+  b+='<div class="t-xs" style="margin-top:-8px">'+(zh?'金額以目前幣別（'+CUR+'）輸入，不會自動換算。可到設定頁切換幣別。':'Amount entered in current currency ('+CUR+'). No auto-conversion. Change currency in Settings.')+'</div>';
+  openModal(T('addExpense'),b,zh?'儲存':'Save');
+}
+function pickExpCat(k,el){
+  selExpCat=k;
+  document.querySelectorAll('#exp-cat-pick .sel-opt').forEach(function(b){b.classList.remove('on');});
+  if(el) el.classList.add('on');
+  /* Auto-fill description */
+  var descEl=document.getElementById('f-edesc');
+  if(descEl){
+    var prev=descEl.value.trim();
+    var allCatVals=Object.values(S[LG].cats||S.en.cats);
+    if(!prev||allCatVals.indexOf(prev)>=0){ descEl.value=catLabel(k); }
+  }
+  /* Auto-select cost type based on category */
+  var typeAcats=['charter','accommodation','equipment','gas'];
+  var autoType=typeAcats.indexOf(k)>=0?'A':'B';
+  pickCostType(autoType);
+}
+function pickCostType(t){
+  selCostType=t;
+  var fi=document.getElementById('f-costtype'); if(fi) fi.value=t;
+  ['A','B'].forEach(function(x){ var el=document.getElementById('ct-'+x); if(el) el.classList.toggle('on',x===t); });
+}
+
+/* ═══════════════════════════════════════════
+   DOCUMENTS
+═══════════════════════════════════════════ */
+function renderDocs(){
+  if(!selTripId && DB.trips.length) selTripId=DB.trips[0].id;
+  var chips=DB.trips.map(function(t){return '<div class="chip'+(selTripId===t.id?' on':'')+'" onclick="selDocTrip(\''+t.id+'\')">'+t.name+'</div>';}).join('');
+  var tid=selTripId;
+  var td=DB.docs.filter(function(d){return d.tid===tid;});
+  var cats=Object.entries(S[LG].docCats||S.en.docCats);
+  var emojis={insuranceDAN:'🛡️',medicalForms:'🏥',certCards:'🪪',flightDetails:'✈️',passports:'🛂',waivers:'✍️',other:'📄'};
+  var h='<div class="ph"><div class="t-h1">'+T('docs')+'</div><button class="add-btn" onclick="openAddDoc()">+</button></div>';
+  h+='<div class="chip-bar">'+chips+'</div>';
+  cats.forEach(function(c){
+    var cd=td.filter(function(d){return d.cat===c[0];});
+    h+='<div class="section-head"><div class="t-h2">'+(emojis[c[0]]||'📄')+' '+c[1]+'</div><span class="badge b-blue">'+cd.length+(LG==='zh'?' 份':' docs')+'</span></div>';
+    h+='<div class="card">';
+    if(!cd.length){ h+='<div style="padding:10px 0;color:#bbb;font-size:13px;text-align:center">'+T('noDoc')+'</div>'; }
+    else{ cd.forEach(function(d,i){ var pn=DB.people.find(function(p){return p.id===d.pid;}); var hasFl=!!d.fileData; h+=(i>0?'<div class="divider"></div>':'')+'<div class="row-between" style="padding:8px 0"><div style="flex:1;min-width:0"><div class="t-body">'+d.name+'</div>'+(pn?'<div class="t-small">👤 '+pn.name+'</div>':'')+(d.exp?'<div class="t-xs">📅 '+fdFull(d.exp)+'</div>':'')+(hasFl?'<span class="badge b-green" style="font-size:10px;margin-top:3px">📎 '+d.fileType+'</span>':'')+'</div><div class="row gap8">'+(hasFl?'<button class="btn btn-success btn-sm" onclick="viewDoc(\''+d.id+'\')">'+T('viewDoc')+'</button>':'')+'<button class="btn btn-danger btn-sm" onclick="delDoc(\''+d.id+'\')">✕</button></div></div>'; }); }
+    h+='</div>';
+  });
+  document.getElementById('sc-docs').innerHTML=h;
+}
+function selDocTrip(id){ selTripId=id; renderDocs(); }
+function delDoc(id){ if(!confirm(T('delDoc'))) return; DB.docs=DB.docs.filter(function(d){return d.id!==id;}); saveDB(); renderDocs(); }
+function viewDoc(id){ var d=DB.docs.find(function(x){return x.id===id;}); if(!d||!d.fileData) return; var w=window.open(); if(w){ if(d.fileData.indexOf('data:image')===0){ w.document.write('<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="'+d.fileData+'" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>'); } else { w.location.href=d.fileData; } } }
+
+function openAddDoc(){
+  if(!selTripId && DB.trips.length) selTripId=DB.trips[0].id;
+  modalMode='addDoc'; selDocCat='insuranceDAN';
+  uploadedFile=null; uploadedFileName=''; uploadedFileType='';
+  var zh=LG==='zh';
+  var ps=DB.people.filter(function(p){return p.tid===selTripId;});
+  var cats=Object.entries(S[LG].docCats||S.en.docCats);
+  var catH=cats.map(function(c,i){return '<div class="sel-opt'+(i===0?' on':'')+'" onclick="pickDocCat(\''+c[0]+'\',this)">'+c[1]+'</div>';}).join('');
+  var pOpts='<option value="">'+T('allParts')+'</option>'+ps.map(function(p){return '<option value="'+p.id+'">'+p.name+'</option>';}).join('');
+  var b='';
+  b+='<div class="form-group"><label class="flabel">'+T('docName')+'</label><input class="finput" id="f-dname" type="text"></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('uploadFile')+'</label>';
+  b+='<div class="upload-area" id="upload-area" onclick="document.getElementById(\'file-pick\').click()">';
+  b+='<input type="file" id="file-pick" style="display:none" accept=".pdf,.jpg,.jpeg,.png,.gif,.heic,.doc,.docx" onchange="handleFileUpload(this)">';
+  b+='<div style="font-size:28px;margin-bottom:6px">📎</div>';
+  b+='<div id="upload-lbl" style="font-size:14px;font-weight:600;color:#888">'+T('tapUpload')+'</div>';
+  b+='<div id="upload-sub" style="font-size:12px;color:#aaa;margin-top:3px">'+T('uploadSub')+'</div>';
+  b+='</div></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('docCat')+'</label><div class="sel-grid" id="doc-cat-pick">'+catH+'</div></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('forWho')+'</label><select class="finput" id="f-dpid">'+pOpts+'</select></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('docExp')+'</label><input class="finput" id="f-dexp" type="date"></div>';
+  openModal(T('addDoc'),b,zh?'儲存':'Save');
+}
+function pickDocCat(k,el){
+  selDocCat=k;
+  document.querySelectorAll('#doc-cat-pick .sel-opt').forEach(function(b){b.classList.remove('on');});
+  if(el) el.classList.add('on');
+  /* Auto-fill description with category name, replacing previous category-name value */
+  var nameEl=document.getElementById('f-dname');
+  if(nameEl){
+    var prev=nameEl.value.trim();
+    var allCatVals=Object.values(S[LG].docCats||S.en.docCats);
+    if(!prev||allCatVals.indexOf(prev)>=0){ nameEl.value=TT('docCats',k); }
+  }
+}
+function handleFileUpload(input){
+  var file=input.files[0]; if(!file) return;
+  uploadedFileName=file.name; uploadedFileType=file.name.split('.').pop().toUpperCase();
+  var reader=new FileReader();
+  reader.onload=function(e){
+    uploadedFile=e.target.result;
+    var area=document.getElementById('upload-area');
+    var lbl=document.getElementById('upload-lbl');
+    var sub=document.getElementById('upload-sub');
+    if(area) area.classList.add('has-file');
+    if(lbl) lbl.textContent='✓ '+file.name;
+    if(sub) sub.textContent=(Math.round(file.size/1024)||1)+' KB · '+uploadedFileType;
+    var nameEl=document.getElementById('f-dname');
+    if(nameEl&&!nameEl.value.trim()) nameEl.value=file.name.replace(/\.[^.]+$/,'');
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ═══════════════════════════════════════════
+   SETTINGS
+═══════════════════════════════════════════ */
+function renderSettings(){
+  var zh=LG==='zh';
+  var prefs=JSON.parse(localStorage.getItem('dmp_prefs')||'{"notif":true}');
+  var langGrid='<div class="option-grid mb12">';
+  [['zh','繁體中文','Traditional Chinese'],['en','English','English'],['ja','日本語','Japanese'],['ko','한국어','Korean'],['th','ภาษาไทย','Thai'],['id','Indonesia','Indonesian'],['fil','Filipino','Filipino'],['vi','Tiếng Việt','Vietnamese'],['es','Español','Spanish'],['fr','Français','French'],['de','Deutsch','German']].forEach(function(l){
+    langGrid+='<div class="option-card'+(LG===l[0]?' on':'')+'" onclick="setLang(\''+l[0]+'\')"><div class="option-card-name">'+l[1]+'</div><div class="option-card-sub">'+l[2]+'</div></div>';
+  });
+  langGrid+='</div>';
+  var curGrid='<div class="option-grid mb12">';
+  Object.entries(CURR).forEach(function(c){ var on=(CUR===c[0]); curGrid+='<div class="option-card'+(on?' on':'')+'" onclick="setCurrency(\''+c[0]+'\')"><div class="option-card-name">'+c[1].sym+'</div><div class="option-card-sub">'+c[1].name+'</div></div>'; });
+  curGrid+='</div><div class="t-xs mb8">'+(zh?'幣別符號僅供顯示，數字不自動換算':'Symbol only — amounts not auto-converted')+'</div>';
+  var h='<div class="ph" style="margin-bottom:8px"><div class="t-h1">'+T('settings')+'</div></div>';
+  h+='<div class="t-label mb8 mt4">'+T('language')+'</div>'+langGrid;
+  h+='<div class="t-label mb8">'+T('currency')+'</div>'+curGrid;
+  h+='<div class="t-label mb8">'+T('profile')+'</div><div class="s-group mb12">';
+  h+='<div class="s-row" onclick="editProfile(\'name\')"><div class="s-icon">👤</div><div class="s-text"><div class="s-title">'+T('pName')+'</div><div class="s-sub">'+PROFILE.name+'</div></div><div class="s-chev">›</div></div>';
+  h+='<div class="s-row" onclick="editProfile(\'cert\')"><div class="s-icon">🪪</div><div class="s-text"><div class="s-title">'+T('pCert')+'</div><div class="s-sub">'+(PROFILE.cert||'—')+'</div></div><div class="s-chev">›</div></div>';
+  h+='<div style="padding:12px"><div class="t-body" style="font-weight:600;margin-bottom:8px">🏅 '+T('pOrg')+'</div>';
+  var orgList=Object.entries(S[LG].orgs||S.en.orgs);
+  h+=orgList.map(function(o){ return '<div class="sel-opt'+(PROFILE.org===o[0]?' on':'')+'" onclick="pickProfileOrg(\''+o[0]+'\')" style="margin:4px 4px 0 0;display:inline-block">'+o[1]+'</div>'; }).join('');
+  h+='</div>';
+  h+='</div>';
+  h+='<div class="t-label mb8">'+T('prefs')+'</div><div class="s-group mb12">';
+  h+='<div class="s-row"><div class="s-icon">🔔</div><div class="s-text"><div class="s-title">'+T('notif')+'</div><div class="s-sub">'+T('notifSub')+'</div></div><label class="tog" onclick="event.stopPropagation()"><input type="checkbox" '+(prefs.notif?'checked':'')+' onchange="savePref(\'notif\',this.checked)"><div class="tog-track"><div class="tog-thumb"></div></div></label></div>';
+  h+='</div>';
+  /* AI Scan Setup */
+  h+='<div class="t-label mb8">'+T('aiScanSetup')+'</div><div class="s-group mb12" style="padding:16px">';
+  h+='<div class="t-small mb10">'+T('aiScanDesc')+'</div>';
+  h+='<div class="form-group" style="margin-bottom:10px"><label class="flabel">Anthropic API Key</label><input class="finput" id="f-apikey" type="password" placeholder="sk-ant-..." value="'+API_KEY+'"></div>';
+  h+='<button class="btn btn-primary btn-full mb8" onclick="saveApiKey()">'+T('saveKey')+'</button>';
+  h+='<div class="t-xs" style="line-height:1.8">'+(hasApiKey()?('<span style="color:#1D9E75">✅ '+T('keySet')+'</span>'):('<span style="color:#E24B4A">⚠️ '+T('keyNotSet')+'</span>'))+'</div>';
+  h+='<div class="t-xs mt4" style="line-height:1.8">'+T('apiKeyHelp')+'</div>';
+  h+='</div>';
+  /* Backup & Restore */
+  h+='<div class="t-label mb8">'+T('backupRestore')+'</div><div class="s-group mb12" style="padding:16px">';
+  h+='<div class="t-small mb10">'+T('backupDesc')+'</div>';
+  h+='<button class="btn btn-primary btn-full mb8" onclick="exportBackup()">'+T('exportBtn')+'</button>';
+  h+='<input type="file" id="restore-file-input" accept="application/json" style="display:none" onchange="handleRestoreFile(this)">';
+  h+='<button class="btn btn-secondary btn-full" onclick="document.getElementById(\'restore-file-input\').click()">'+T('importBtn')+'</button>';
+  h+='<div class="t-xs mt8" style="line-height:1.8">'+T('backupHelp')+'</div>';
+  h+='</div>';
+  /* Pro section */
+  h+='<div class="t-label mb8">'+(zh?'專業版（教練專用）':'Pro Mode (Coaches Only)')+'</div><div class="s-group mb12">';
+  if(isPro()){
+    h+='<div class="s-row" onclick="showChangeCode()"><div class="s-icon">🔑</div><div class="s-text"><div class="s-title">'+T('changeCodes')+'</div><div class="s-sub">'+(zh?'目前：':'Current: ')+INVITE_CODE+'</div></div><div class="s-chev">›</div></div>';
+    h+='<div class="s-row" onclick="doLockPro()"><div class="s-icon">🔒</div><div class="s-text"><div class="s-title" style="color:#E24B4A">'+T('lockPro')+'</div><div class="s-sub">'+T('lockProSub')+'</div></div></div>';
+  } else {
+    h+='<div class="s-row" onclick="showUnlockModal()"><div class="s-icon">🗝️</div><div class="s-text"><div class="s-title">'+T('unlockBtn').replace('🗝️ ','')+'</div><div class="s-sub">'+T('proGateDesc')+'</div></div><div class="s-chev">›</div></div>';
+  }
+  h+='</div>';
+  h+='<div class="t-label mb8">'+T('about')+'</div><div class="s-group mb12">';
+  h+='<div class="s-row"><div class="s-icon">ℹ️</div><div class="s-text"><div class="s-title">'+T('version')+'</div></div><div class="t-xs" style="font-family:monospace">2.0.0</div></div>';
+  h+='<div class="s-row" onclick="showInfoModal(\'privacy\')"><div class="s-icon">🔒</div><div class="s-text"><div class="s-title">'+T('privacy')+'</div></div><div class="s-chev">›</div></div>';
+  h+='<div class="s-row" onclick="showInfoModal(\'terms\')"><div class="s-icon">📄</div><div class="s-text"><div class="s-title">'+T('terms')+'</div></div><div class="s-chev">›</div></div>';
+  h+='<div class="s-row" onclick="showInfoModal(\'feedback\')"><div class="s-icon">💬</div><div class="s-text"><div class="s-title">'+T('feedback')+'</div></div><div class="s-chev">›</div></div>';
+  h+='</div>';
+  h+='<div class="s-group"><div class="s-row" onclick="doReset()"><div class="s-icon">🗑️</div><div class="s-text"><div class="s-title" style="color:#E24B4A">'+T('resetAll')+'</div></div></div></div>';
+  document.getElementById('sc-settings').innerHTML=h;
+}
+function setLang(lg){ LG=lg; localStorage.setItem('dmp_lg',lg); applyTabLabels(); renderSettings(); }
+function setCurrency(c){ CUR=c; localStorage.setItem('dmp_cur',c); renderSettings(); }
+function savePref(k,v){ var p=JSON.parse(localStorage.getItem('dmp_prefs')||'{}'); p[k]=v; localStorage.setItem('dmp_prefs',JSON.stringify(p)); }
+function exportTripPDF(){
+  if(typeof window.jspdf==='undefined'&&typeof jsPDF==='undefined'){ alert(LG==='zh'?'PDF程式庫載入中，請稍後再試':'PDF library loading, please try again'); return; }
+  var JsPDF=window.jspdf?window.jspdf.jsPDF:jsPDF;
+  var trip=DB.trips.find(function(t){return t.id===selTripId;});
+  if(!trip){ alert(LG==='zh'?'請先選擇旅程':'Please select a trip first'); return; }
+  var ps=DB.people.filter(function(p){return p.tid===selTripId;});
+  var exps=DB.expenses.filter(function(e){return e.tid===selTripId;});
+  var zh=LG==='zh';
+  var doc=new JsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  var sym=(CURR[CUR]||CURR.TWD).sym;
+  var pageW=doc.internal.pageSize.getWidth();
+  var margin=14;
+
+  /* ── Header ── */
+  doc.setFillColor(4,44,83);
+  doc.rect(0,0,pageW,22,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(16); doc.setFont('helvetica','bold');
+  doc.text('DiveMaster Pro',margin,10);
+  doc.setFontSize(9); doc.setFont('helvetica','normal');
+  doc.text(zh?'潛水行程管理報告':'Dive Trip Report',margin,16);
+  doc.text(new Date().toLocaleDateString(),pageW-margin,16,{align:'right'});
+
+  /* ── Trip info ── */
+  doc.setTextColor(0,0,0);
+  var y=30;
+  doc.setFontSize(14); doc.setFont('helvetica','bold');
+  doc.text(trip.name,margin,y); y+=7;
+  doc.setFontSize(9); doc.setFont('helvetica','normal');
+  doc.setTextColor(80,80,80);
+  if(trip.dep&&trip.ret) doc.text((zh?'日期: ':'Date: ')+trip.dep+' → '+trip.ret,margin,y);
+  if(trip.loc) doc.text((zh?'地點: ':'Location: ')+trip.loc,pageW/2,y);
+  y+=5;
+  if(trip.vessel) doc.text((zh?'船隻: ':'Vessel: ')+trip.vessel,margin,y);
+  doc.text((zh?'成員: ':'Members: ')+ps.length+(zh?'人':''),pageW/2,y);
+  y+=8;
+
+  /* ── Members table ── */
+  doc.setTextColor(0,0,0);
+  doc.setFontSize(11); doc.setFont('helvetica','bold');
+  doc.text(zh?'成員名單':'Member List',margin,y); y+=2;
+  if(ps.length>0){
+    var certLabels=S[LG]&&S[LG].certs?S[LG].certs:S.en.certs;
+    var orgLabels=S[LG]&&S[LG].orgs?S[LG].orgs:S.en.orgs;
+    doc.autoTable({
+      startY:y,
+      margin:{left:margin,right:margin},
+      styles:{fontSize:8,cellPadding:2},
+      headStyles:{fillColor:[4,44,83],textColor:[255,255,255],fontStyle:'bold'},
+      alternateRowStyles:{fillColor:[245,245,243]},
+      head:[[zh?'姓名':'Name',zh?'證照':'Cert',zh?'機構':'Org',zh?'護照':'Passport',zh?'應付':'Due',zh?'已付':'Paid',zh?'狀態':'Status']],
+      body:ps.map(function(p){
+        var s=payStatus(p);
+        var sLabel=zh?(s==='paid'?'✅已付':s==='partial'?'⚠️部份':'❌未付'):(s==='paid'?'✅Paid':s==='partial'?'⚠️Partial':'❌Pending');
+        return [p.name,(certLabels[p.cert]||p.cert),(orgLabels[p.org]||p.org),p.passport||'—',sym+(p.due||0).toLocaleString(),sym+(p.paid||0).toLocaleString(),sLabel];
+      })
+    });
+    y=doc.lastAutoTable.finalY+8;
+  } else { y+=6; }
+
+  /* ── Expenses table ── */
+  if(y>240){ doc.addPage(); y=14; }
+  doc.setFontSize(11); doc.setFont('helvetica','bold');
+  doc.setTextColor(0,0,0);
+  doc.text(zh?'費用記錄':'Expense Records',margin,y); y+=2;
+  if(exps.length>0){
+    var catLabels=S[LG]&&S[LG].cats?S[LG].cats:S.en.cats;
+    var totalAmt=exps.reduce(function(a,e){return a+e.amt;},0);
+    doc.autoTable({
+      startY:y,
+      margin:{left:margin,right:margin},
+      styles:{fontSize:8,cellPadding:2},
+      headStyles:{fillColor:[4,44,83],textColor:[255,255,255],fontStyle:'bold'},
+      alternateRowStyles:{fillColor:[245,245,243]},
+      head:[[zh?'項目':'Item',zh?'類別':'Category',zh?'類型':'Type',zh?'日期':'Date',zh?'金額':'Amount']],
+      body:exps.map(function(e){
+        var typeLabel=e.costType==='B'?(zh?'🧍每人':'🧍Per-pax'):(zh?'👥總額':'👥Total');
+        return [e.desc,(catLabels[e.cat]||e.cat),typeLabel,e.date,sym+(e.amt||0).toLocaleString()];
+      }),
+      foot:[[{content:(zh?'費用合計':'Total'),colSpan:4,styles:{fontStyle:'bold',halign:'right'}},{content:sym+totalAmt.toLocaleString(),styles:{fontStyle:'bold'}}]]
+    });
+    y=doc.lastAutoTable.finalY+8;
+  }
+
+  /* ── Pricing result ── */
+  var pr=trip.pricingResult;
+  if(pr){
+    if(y>240){ doc.addPage(); y=14; }
+    doc.setFontSize(11); doc.setFont('helvetica','bold');
+    doc.setTextColor(0,0,0);
+    doc.text(zh?'收費計算結果':'Pricing Summary',margin,y); y+=6;
+    doc.setFontSize(9); doc.setFont('helvetica','normal');
+    var lines=[
+      [(zh?'建議每人收費':'Suggested Price/pax'), sym+Math.round(pr.suggested).toLocaleString()],
+      [(zh?'每人成本':'Cost/pax'), sym+Math.round(pr.perPersonCost).toLocaleString()],
+      [(zh?'損益平衡點':'Break-even'), sym+Math.round(pr.breakEven).toLocaleString()],
+      [(zh?'付費人數':'Paying pax'), pr.paying+(zh?'人':'')],
+      [(zh?'利潤率':'Margin'), Math.round(pr.profitPct)+'%'],
+      [(zh?'預計利潤':'Est. Profit'), sym+Math.round(pr.profit).toLocaleString()]
+    ];
+    lines.forEach(function(l){
+      doc.text(l[0]+':',margin,y);
+      doc.text(l[1],90,y);
+      y+=5;
+    });
+  }
+
+  /* ── Footer ── */
+  doc.setFontSize(7); doc.setTextColor(160,160,160);
+  doc.text('Generated by DiveMaster Pro · '+new Date().toLocaleString(),pageW/2,doc.internal.pageSize.getHeight()-6,{align:'center'});
+
+  var dateStr=new Date().toISOString().slice(0,10);
+  doc.save(trip.name+'_'+dateStr+'.pdf');
+}
+function exportBackup(){
+  var data={
+    app:'DiveMasterPro',
+    version:2,
+    exportedAt:new Date().toISOString(),
+    DB:DB,
+    PROFILE:PROFILE,
+    prefs:JSON.parse(localStorage.getItem('dmp_prefs')||'{}'),
+    CUR:CUR,
+    LG:LG
+  };
+  var json=JSON.stringify(data,null,2);
+  var blob=new Blob([json],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  var dateStr=new Date().toISOString().slice(0,10);
+  a.href=url;
+  a.download=T('exportFileName')+'_'+dateStr+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); },1000);
+}
+function handleRestoreFile(input){
+  var file=input.files[0]; if(!file) return;
+  if(!confirm(T('restoreConfirm'))){ input.value=''; return; }
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var data=JSON.parse(e.target.result);
+      if(!data||data.app!=='DiveMasterPro'||!data.DB||!Array.isArray(data.DB.trips)) throw new Error('invalid');
+      localStorage.setItem('dmp_v2',JSON.stringify(data.DB));
+      if(data.PROFILE) localStorage.setItem('dmp_profile',JSON.stringify(data.PROFILE));
+      if(data.prefs) localStorage.setItem('dmp_prefs',JSON.stringify(data.prefs));
+      if(data.CUR) localStorage.setItem('dmp_cur',data.CUR);
+      if(data.LG) localStorage.setItem('dmp_lg',data.LG);
+      alert(T('restoreSuccess'));
+      location.reload();
+    }catch(err){
+      alert(T('restoreFail'));
+      input.value='';
+    }
+  };
+  reader.readAsText(file);
+}
+function openImportPeople(){
+  var zh=LG==='zh';
+  var b='<div class="t-small mb10">'+T('importDesc')+'</div>';
+  b+='<div style="background:#f5f5f3;border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;line-height:1.8">'+T('importCols')+'</div>';
+  b+='<button class="btn btn-secondary btn-full mb10" onclick="downloadImportTemplate()">'+T('importTemplateBtn')+'</button>';
+  b+='<input type="file" id="import-people-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleImportPeopleFile(this)">';
+  b+='<button class="btn btn-primary btn-full" onclick="document.getElementById(\'import-people-file\').click()">'+(zh?'📂 選擇 Excel / CSV 檔案':'📂 Choose Excel / CSV File')+'</button>';
+  openModal(T('importTitle'),b,false);
+}
+function downloadImportTemplate(){
+  if(typeof XLSX==='undefined'){ alert('載入中，請稍後再試'); return; }
+  var ws=XLSX.utils.aoa_to_sheet([
+    ['姓名','護照號碼','Email','電話','證照等級','發證機構','證照號碼','應付金額'],
+    ['王小明','A123456789','test@email.com','0912345678','dm','PADI','P123456',25000],
+    ['陳美麗','B987654321','','0987654321','ow','SSI','S789012',25000]
+  ]);
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'團員名單');
+  XLSX.writeFile(wb,'DiveMasterPro_團員範本.xlsx');
+}
+function handleImportPeopleFile(input){
+  var file=input.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var data=new Uint8Array(e.target.result);
+      var wb=XLSX.read(data,{type:'array'});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      if(!rows||rows.length<2){ alert(T('importNoRows')); return; }
+      /* Column mapping - support Chinese and English headers */
+      var headerRow=rows[0].map(function(h){ return String(h).trim(); });
+      var colMap={};
+      var aliases={
+        name:['姓名','name','全名','full name'],
+        passport:['護照號碼','passport','護照','passport no'],
+        email:['email','電子郵件','電郵','e-mail'],
+        phone:['電話','phone','手機','mobile','tel'],
+        cert:['證照等級','cert level','cert','certlevel','certification'],
+        org:['發證機構','cert org','org','organization','certorg'],
+        certNum:['證照號碼','cert number','certnum','cert no','certno'],
+        due:['應付金額','amount due','due','amount','金額']
+      };
+      Object.keys(aliases).forEach(function(field){
+        aliases[field].forEach(function(alias){
+          headerRow.forEach(function(h,i){
+            if(h.toLowerCase()===alias.toLowerCase()&&colMap[field]===undefined) colMap[field]=i;
+          });
+        });
+      });
+      if(colMap.name===undefined){ alert(LG==='zh'?'找不到「姓名」欄位，請確認標題列':'Could not find "Name" column — check the header row'); return; }
+      var parsed=[];
+      for(var i=1;i<rows.length;i++){
+        var row=rows[i];
+        var nm=String(row[colMap.name]||'').trim();
+        if(!nm) continue;
+        var certRaw=String(row[colMap.cert]||'').trim().toLowerCase();
+        var certMap={'開放水域':'ow','ow':'ow','open water':'ow','進階':'aow','aow':'aow','advanced':'aow','救援':'rescue','rescue':'rescue','潛水長':'dm','dm':'dm','divemaster':'dm','教練':'instructor','instructor':'instructor','技術':'tech','tech':'tech'};
+        var cert=certMap[certRaw]||'ow';
+        var orgRaw=String(row[colMap.org]||'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');
+        var orgMap={'sditdi':'sditdi','sdi':'sditdi','tdi':'sditdi','padi':'padi','ssi':'ssi','cmas':'cmas','naui':'naui','bsac':'bsac','raid':'raid','aida':'aida','molchanovs':'molchanovs','pfi':'pfi'};
+        var org=orgMap[orgRaw]||'padi';
+        parsed.push({
+          name:nm,
+          passport:String(row[colMap.passport]||'').trim(),
+          email:String(row[colMap.email]||'').trim(),
+          phone:String(row[colMap.phone]||'').trim(),
+          cert:cert, org:org,
+          certNum:String(row[colMap.certNum]||'').trim(),
+          due:parseFloat(row[colMap.due])||0,
+          checked:true
+        });
+      }
+      if(!parsed.length){ alert(T('importNoRows')); return; }
+      showImportReviewModal(parsed);
+    }catch(err){ alert(T('importParseFail')); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+function showImportReviewModal(parsed){
+  var zh=LG==='zh';
+  var previewMsg=T('importPreview').replace('{n}',parsed.length);
+  var b='<div class="t-small mb10">'+previewMsg+'</div>';
+  parsed.forEach(function(p,i){
+    var orgLabel=(S[LG].orgs||S.en.orgs)[p.org]||p.org;
+    var certLabel=(S[LG].certs||S.en.certs)[p.cert]||p.cert;
+    b+='<div class="card" style="margin-bottom:8px;padding:10px">';
+    b+='<div class="row gap8" style="align-items:center">';
+    b+='<input type="checkbox" id="ip-check-'+i+'" checked style="width:20px;height:20px;flex-shrink:0">';
+    b+='<div style="flex:1">';
+    b+='<div style="font-weight:600;font-size:14px">'+p.name+'</div>';
+    b+='<div class="t-xs" style="margin-top:2px">'+certLabel+' · '+orgLabel+(p.due>0?' · '+fc(p.due):'')+'</div>';
+    if(p.passport) b+='<div class="t-xs">🛂 '+p.passport+'</div>';
+    b+='</div></div></div>';
+  });
+  window._importParsed=parsed;
+  modalMode='importReview';
+  openModal(zh?'確認匯入名單':'Confirm Import',b,T('importAddBtn'));
+}
+function saveApiKey(){
+  var el=document.getElementById('f-apikey');
+  if(!el) return;
+  API_KEY=el.value.trim();
+  localStorage.setItem('dmp_apikey',API_KEY);
+  renderSettings();
+  alert(LG==='zh'?(API_KEY?'✅ 已儲存':'已清除'):(API_KEY?'✅ Saved':'Cleared'));
+}
+function pickProfileOrg(key){
+  PROFILE.org=key;
+  localStorage.setItem('dmp_profile',JSON.stringify(PROFILE));
+  renderSettings();
+}
+function editProfile(f){
+  modalMode='editProfile'; editProfileField=f;
+  var labels={name:T('editName'),cert:T('editCert'),org:T('editOrg')};
+  openModal(labels[f]||f,'<div class="form-group"><label class="flabel">'+labels[f]+'</label><input class="finput" id="f-prof" type="text" value="'+(PROFILE[f]||'')+'"></div>',LG==='zh'?'儲存':'Save');
+  setTimeout(function(){ var el=document.getElementById('f-prof'); if(el){el.focus();el.select();} },350);
+}
+function showUnlockModal(){
+  modalMode='unlock';
+  var zh=LG==='zh';
+  var b='<div style="text-align:center;padding:16px 0 8px"><div style="font-size:48px;margin-bottom:10px">🔐</div>';
+  b+='<div class="t-body mb12">'+(zh?'請向主辦教練索取邀請碼':'Ask the organising coach for your invite code.')+'</div></div>';
+  b+='<div class="form-group"><label class="flabel">'+T('inviteCode')+'</label><input class="finput" id="f-code" type="text" placeholder="XXXX" style="text-transform:uppercase;letter-spacing:2px;font-size:18px;text-align:center"><div id="code-error" class="form-error" style="display:none">'+T('wrongCode')+'</div></div>';
+  openModal(zh?'解鎖專業版':'Unlock Pro Mode',b,zh?'解鎖':'Unlock');
+  setTimeout(function(){ var el=document.getElementById('f-code'); if(el) el.focus(); },350);
+}
+function showChangeCode(){
+  modalMode='changeCode';
+  var zh=LG==='zh';
+  var b='<div class="form-group"><div style="background:#E1F5EE;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:15px;font-weight:700;letter-spacing:2px;color:#085041">'+INVITE_CODE+'</div><label class="flabel">'+T('newCode')+'</label><input class="finput" id="f-newcode" type="text" placeholder="NEW CODE" style="text-transform:uppercase;letter-spacing:2px"></div>';
+  openModal(T('changeCodes'),b,LG==='zh'?'儲存':'Save');
+}
+function doLockPro(){ lockPro(); renderSettings(); }
+function showInfoModal(t){ openModal(T(t+'_t'),'<div style="font-size:14px;color:#555;line-height:1.9;white-space:pre-line">'+T(t+'_b')+'</div>',false); }
+function doReset(){ if(!confirm(T('resetConfirm'))) return; localStorage.removeItem('dmp_v2'); location.reload(); }
+
+/* ═══════════════════════════════════════════
+   HELP
+═══════════════════════════════════════════ */
+function renderHelp(){
+  var zh=LG==='zh';
+  var faqs=zh?[
+    {q:'FOC 是什麼？',a:'Free of Charge，船公司或渡假村提供給教練的免費名額。例如10人送1，24人團有2個FOC。'},
+    {q:'A類和B類費用有什麼差別？',a:'A類是渡假村/船公司包含的（教練免費），不計入分攤。B類是額外費用（機票、小費等），教練的份額由付費團員分攤。'},
+    {q:'邀請碼在哪裡輸入？',a:'⚙️ 設定 → 往下找「專業版」→ 點「輸入邀請碼解鎖」。'},
+    {q:'財務人數為什麼不對？',a:'系統自動從「成員」頁讀取人數。請先到成員頁新增成員。'},
+    {q:'幣別怎麼切換？',a:'⚙️ 設定 → 幣別，點選想要的幣別格子即可。'},
+    {q:'資料會不會消失？',a:'資料儲存在瀏覽器。清除瀏覽器資料會消失，建議定期截圖備份。'},
+    {q:'掃描功能支援什麼文件？',a:'支援護照資料頁、潛水證照正面、保險卡。清晰、光線充足的照片效果最好。'},
+    {q:'為什麼掃描說「無法識別」或要求設定金鑰？',a:'掃描功能需要你自己的 Anthropic API 金鑰。到⚙️設定→AI掃描設定，依照步驟申請並貼上金鑰即可。免費額度約可用上千次。'},
+  ]:[
+    {q:'What is FOC?',a:'Free of Charge — complimentary slots from the boat/resort for coaches. E.g. 1 free per 10 pax: 24 pax = 2 FOC.'},
+    {q:'What is the difference between Type A and Type B?',a:'Type A costs are included by the resort/boat (coach is free) and not split. Type B costs (flights, tips, etc.) include the coach\'s share, which is split among paying members.'},
+    {q:'Where do I enter the invite code?',a:'⚙️ Settings → scroll down to "Pro Mode" → tap "Enter Invite Code".'},
+    {q:'Why is the pax count wrong?',a:'The system reads pax from the People tab. Add participants there first.'},
+    {q:'How do I switch currency?',a:'⚙️ Settings → Currency. Tap any currency tile.'},
+    {q:'Will my data be lost?',a:'Data is stored in your browser. Clearing browser data will delete it. Screenshot important info regularly.'},
+    {q:'What documents does the scan support?',a:'Passport data pages, dive cert fronts, insurance cards. Best results with clear, well-lit photos.'},
+    {q:'Why does scanning say "could not recognize" or ask for a key?',a:'Scanning needs your own Anthropic API key. Go to ⚙️ Settings → AI Scan Setup and follow the steps to get and paste a key. Free credit covers ~1000 scans.'},
+  ];
+  var steps=zh?[
+    {title:'新增旅程',desc:'到「旅程」頁點 +，選擇船宿/渡假村/一日船潛，設定FOC規則和目標利潤率。'},
+    {title:'新增成員',desc:'到「成員」頁點 +，可以拍照掃描護照或證照自動填入，或手動填寫。'},
+    {title:'輸入費用',desc:'到「財務」頁點 +，選擇類別後系統自動判斷A類或B類，再填金額。'},
+    {title:'計算收費',desc:'解鎖專業版後，財務頁有「立即計算」按鈕，自動算出每人應收金額和獲利。'},
+    {title:'管理文件',desc:'到「文件」頁點 +，可以上傳護照、保險卡、證照等文件。'},
+  ]:[
+    {title:'Add a Trip',desc:'Go to Trips tab, tap +. Choose liveaboard/resort/day trip, set the FOC rule and target margin.'},
+    {title:'Add Participants',desc:'Go to People tab, tap +. Scan a passport or cert to auto-fill, or enter manually.'},
+    {title:'Enter Expenses',desc:'Go to Finance tab, tap +. The system auto-selects Type A or B based on category.'},
+    {title:'Calculate Pricing',desc:'Unlock Pro mode, then use the Calculate button on the Finance tab to get suggested prices and profit.'},
+    {title:'Manage Documents',desc:'Go to Docs tab, tap +. Upload passports, insurance cards, and dive certs.'},
+  ];
+  var h='<div class="ph"><div class="t-h1">'+T('help')+'</div></div>';
+  h+='<div class="help-section"><div class="help-title">📖 '+(zh?'使用步驟':'How to Use')+'</div>';
+  steps.forEach(function(s,i){ h+='<div class="help-item"><div class="help-num">'+(i+1)+'</div><div><div class="t-h3 mb8">'+s.title+'</div><div class="t-body">'+s.desc+'</div></div></div>'; });
+  h+='</div>';
+  h+='<div class="help-section"><div class="help-title">❓ FAQ</div>';
+  faqs.forEach(function(f){ h+='<div class="faq-item"><div class="faq-q">Q: '+f.q+'</div><div class="faq-a">A: '+f.a+'</div></div>'; });
+  h+='</div>';
+  h+='<div class="card"><div class="t-h3 mb8">🐛 '+T('bugReport')+'</div>';
+  h+='<div class="t-small mb12">'+T('bugDesc')+'</div>';
+  h+='<button class="btn btn-secondary btn-full" onclick="copyBugTemplate()">📋 '+T('copyTemplate')+'</button></div>';
+  document.getElementById('sc-help').innerHTML=h;
+}
+function copyBugTemplate(){
+  var zh=LG==='zh';
+  var tmpl=zh?
+    '【DiveMaster Pro 問題回報】\n日期：'+new Date().toLocaleDateString('zh-TW')+'\n頁面：\n操作：\n問題：\n截圖：（請附上）':
+    '[DiveMaster Pro Bug Report]\nDate: '+new Date().toLocaleDateString('en-US')+'\nScreen: \nAction: \nProblem: \nScreenshot: (please attach)';
+  if(navigator.clipboard){ navigator.clipboard.writeText(tmpl).then(function(){ alert(T('copied')); }); }
+  else { var ta=document.createElement('textarea'); ta.value=tmpl; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert(T('copied')); }
+}
+
+/* ═══════════════════════════════════════════
+   MODAL SAVE
+═══════════════════════════════════════════ */
+function modalSave(){
+  if(modalMode==='editTrip'){
+    var eid=document.getElementById('f-editid').value;
+    var t=DB.trips.find(function(x){return x.id===eid;}); if(!t) return;
+    var n=document.getElementById('f-tname').value.trim(); if(!n) return;
+    t.name=n;
+    t.dest=document.getElementById('f-tdest').value||'';
+    t.charter=document.getElementById('f-tcharter').value||'';
+    t.dep=document.getElementById('f-tdep').value||'';
+    t.ret=document.getElementById('f-tret').value||'';
+    t.tripType=selTripType;
+    t.focRule=parseInt(document.getElementById('f-tfoc').value)||0;
+    t.margin=parseFloat(document.getElementById('f-tmargin').value)||20;
+    saveDB(); closeModal(); renderTrips();
+  }
+  else if(modalMode==='addTrip'){
+    var n=document.getElementById('f-tname').value.trim();
+    if(!n) return;
+    var id=uid();
+    DB.trips.push({
+      id:id, name:n,
+      dest:document.getElementById('f-tdest').value||'',
+      charter:document.getElementById('f-tcharter').value||'',
+      dep:document.getElementById('f-tdep').value||'',
+      ret:document.getElementById('f-tret').value||'',
+      tripType:selTripType,
+      status:'planning',
+      focRule:parseInt(document.getElementById('f-tfoc').value)||0,
+      margin:parseFloat(document.getElementById('f-tmargin').value)||20,
+      coachCount:0, notes:''
+    });
+    saveDB(); closeModal(); renderTrips();
+  }
+  else if(modalMode==='addPerson'){
+    var nm=document.getElementById('f-pname').value.trim();
+    if(!nm){ var e=document.getElementById('fe-pname'); if(e) e.style.display='block'; return; }
+    if(!selTripId && DB.trips.length) selTripId=DB.trips[0].id;
+    DB.people.push({
+      id:uid(), tid:selTripId, name:nm,
+      email:document.getElementById('f-pemail').value||'',
+      phone:document.getElementById('f-pphone').value||'',
+      passport:document.getElementById('f-ppassport').value||'',
+      cert:selCert, org:selOrg,
+      certNum:document.getElementById('f-pcertnum').value||'',
+      due:parseFloat(document.getElementById('f-pdue').value)||0,
+      paid:0
+    });
+    saveDB(); closeModal(); renderPeople();
+  }
+  else if(modalMode==='importReview'){
+    var parsed=window._importParsed||[];
+    var added=0;
+    parsed.forEach(function(p,i){
+      var chk=document.getElementById('ip-check-'+i);
+      if(!chk||!chk.checked) return;
+      if(!selTripId && DB.trips.length) selTripId=DB.trips[0].id;
+      DB.people.push({
+        id:uid(), tid:selTripId, name:p.name,
+        email:p.email||'', phone:p.phone||'',
+        passport:p.passport||'',
+        cert:p.cert, org:p.org, certNum:p.certNum||'',
+        due:p.due||0, paid:0
+      });
+      added++;
+    });
+    saveDB(); closeModal();
+    if(added>0){
+      window._importParsed=[];
+      renderPeople();
+      alert(T('importDone').replace('{n}',added));
+    }
+  }
+  else if(modalMode==='scanReview'){
+    var added=0;
+    scannedExpenseItems.forEach(function(it,i){
+      var chk=document.getElementById('si-check-'+i);
+      if(!chk||!chk.checked) return;
+      var descEl=document.getElementById('si-desc-'+i);
+      var amtEl=document.getElementById('si-amt-'+i);
+      var typeEl=document.getElementById('si-type-'+i);
+      var desc=descEl?descEl.value.trim():it.desc;
+      var amt=amtEl?(parseFloat(amtEl.value)||0):it.amount;
+      var ctype=typeEl?typeEl.value:it.costType;
+      if(!desc||amt<=0) return;
+      if(!selTripId && DB.trips.length) selTripId=DB.trips[0].id;
+      var trip=DB.trips.find(function(t){return t.id===selTripId;})||{};
+      DB.expenses.push({
+        id:uid(), tid:selTripId, cat:it.category||'other',
+        costType:ctype, desc:desc, amt:amt, curr:CUR,
+        date:trip.dep||new Date().toISOString().slice(0,10)
+      });
+      added++;
+    });
+    saveDB(); closeModal();
+    if(added>0){ scannedExpenseItems=[]; renderFinance(); }
+    else { alert(LG==='zh'?'未選擇任何項目':'No items selected'); showScanReviewModal(); }
+  }
+  else if(modalMode==='addExpense'){
+    var desc=document.getElementById('f-edesc').value.trim();
+    var amt=parseFloat(document.getElementById('f-eamt').value)||0;
+    if(!desc||isNaN(amt)||amt<=0) return;
+    if(!selTripId && DB.trips.length) selTripId=DB.trips[0].id;
+    var ct=document.getElementById('f-costtype');
+    DB.expenses.push({
+      id:uid(), tid:selTripId, cat:selExpCat,
+      costType:ct?ct.value:'A',
+      desc:desc, amt:amt, curr:CUR,
+      date:document.getElementById('f-edate').value||new Date().toISOString().slice(0,10)
+    });
+    saveDB(); closeModal(); renderFinance();
+  }
+  else if(modalMode==='addDoc'){
+    var dn=document.getElementById('f-dname').value.trim();
+    if(!dn&&uploadedFileName) dn=uploadedFileName.replace(/\.[^.]+$/,'');
+    if(!dn) return;
+    if(!selTripId && DB.trips.length) selTripId=DB.trips[0].id;
+    DB.docs.push({
+      id:uid(), tid:selTripId,
+      pid:document.getElementById('f-dpid').value||'',
+      cat:selDocCat, name:dn,
+      exp:document.getElementById('f-dexp').value||'',
+      fileData:uploadedFile||null, fileType:uploadedFileType||''
+    });
+    uploadedFile=null; uploadedFileName=''; uploadedFileType='';
+    saveDB(); closeModal(); renderDocs();
+  }
+  else if(modalMode==='editProfile'){
+    var v=document.getElementById('f-prof').value.trim();
+    if(v){ PROFILE[editProfileField]=v; localStorage.setItem('dmp_profile',JSON.stringify(PROFILE)); }
+    closeModal(); renderSettings();
+  }
+  else if(modalMode==='unlock'){
+    var code=document.getElementById('f-code').value.trim();
+    if(tryUnlock(code)){
+      closeModal();
+      var zh2=LG==='zh';
+      showWelcomeModal();
+    } else {
+      var err=document.getElementById('code-error'); if(err) err.style.display='block';
+    }
+  }
+  else if(modalMode==='changeCode'){
+    var nc=document.getElementById('f-newcode').value.trim();
+    if(changeCode(nc)){
+      closeModal();
+      alert((LG==='zh'?T('codeUpdated'):T('codeUpdated'))+INVITE_CODE);
+      renderSettings();
+    } else {
+      alert(LG==='zh'?'邀請碼至少需要4個字元':'Code must be at least 4 characters');
+    }
+  }
+}
+/* Fix editProfile to pass the field key */
+
+function showWelcomeModal(){
+  var zh=LG==='zh';
+  var sec=function(emoji,title,body){ return '<div style="background:#f5f5f3;border-radius:12px;padding:14px;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:#042C53;margin-bottom:8px">'+emoji+' '+title+'</div><div style="font-size:12px;color:#444;line-height:1.85">'+body+'</div></div>'; };
+  var b='<div style="text-align:center;padding:6px 0 12px"><div style="font-size:40px;margin-bottom:6px">🎉</div><div class="t-h2">'+(zh?'DiveMaster Pro 使用說明':'DiveMaster Pro — User Guide')+'</div></div>';
+
+  /* ── Section 1: 旅程 ── */
+  b+=sec('🗺️', zh?'旅程管理':'Trip Management', zh?
+    '按右上角「+」新增旅程，選擇類型（船宿/渡假村/一日船潛）。<br>'+
+    '旅程卡片上可以直接編輯或刪除。<br>'+
+    '所有成員、費用、文件都依旅程分類管理。'
+    :
+    'Tap「+」to add a trip. Choose type (liveaboard / resort / day trip).<br>'+
+    'Tap Edit on the trip card to update details.<br>'+
+    'Members, expenses, and docs are all organized by trip.'
+  );
+
+  /* ── Section 2: 成員 ── */
+  b+=sec('👥', zh?'成員管理':'Member Management', zh?
+    '按「+」逐筆新增，或按「📥 匯入Excel」一次大量匯入（支援 .xlsx/.csv）。<br>'+
+    '可下載範本格式，填好後上傳即可批次匯入。<br>'+
+    '每位成員可記錄：姓名、護照、Email、電話、證照等級、發證機構、證照號碼、應付金額。<br>'+
+    '點成員卡片可記錄收款（已付金額）。<br>'+
+    '若開通AI掃描金鑰，可拍護照/證照照片自動填入。'
+    :
+    'Tap「+」to add one-by-one, or「📥 Import Excel」for bulk import (.xlsx/.csv).<br>'+
+    'Download the template, fill it in, then upload to import all at once.<br>'+
+    'Stores: name, passport, email, phone, cert level, org, cert number, amount due.<br>'+
+    'Tap a member card to record payment received.<br>'+
+    'With an AI key, scan passport / cert photos to auto-fill.'
+  );
+
+  /* ── Section 3: 費用 ── */
+  b+=sec('💰', zh?'費用管理':'Expense Management', zh?
+    '新增費用時選擇類型：<br>'+
+    '👥 <b>總額</b>：整團共用一筆（如包船），系統自動 ÷ 付費人數算每人成本。<br>'+
+    '🧍 <b>每人金額</b>：這金額已是每人要付的（如機票 ฿17,000/人），直接加總。<br>'+
+    '選類別後描述欄會自動填入，金額用目前設定的幣別輸入，不會自動換算。'
+    :
+    'When adding an expense, choose a type:<br>'+
+    '👥 <b>Total</b>: one lump sum for the group (e.g. charter) — auto ÷ paying pax.<br>'+
+    '🧍 <b>Per-Person</b>: already a per-person amount (e.g. flight ฿17,000/pax) — summed directly.<br>'+
+    'Category auto-fills the description. Amount uses your current currency — no auto-conversion.'
+  );
+
+  /* ── Section 4: 收費計算機 ── */
+  b+=sec('🧮', zh?'收費計算機（PRO）':'Pricing Calculator (PRO)', zh?
+    '① 總人數：所有出發的人（含教練）<br>'+
+    '② FOC規則：船公司條件，10送1填10，沒有填0<br>'+
+    '③ 免費教練總人數：所有不付費的教練<br>'+
+    '④ 付費人數：自動 = ①-③，可手動覆蓋<br>'+
+    '⑤ 目標利潤率：填20代表收費比成本多20%<br>'+
+    '按「立即計算」得出每人建議售價、損益平衡點、預計利潤。<br>'+
+    '結果會自動儲存，換頁再回來不會消失。'
+    :
+    '① Total Pax: everyone going (incl. coaches)<br>'+
+    '② FOC Rule: e.g. 10 for "1 free per 10". Enter 0 for none<br>'+
+    '③ Free Coaches: all coaches who don\u2019t pay<br>'+
+    '④ Paying Members: auto = ①-③, editable<br>'+
+    '⑤ Target Margin: 20 = charge 20% above cost<br>'+
+    'Tap Calculate to get suggested price, break-even, and profit.<br>'+
+    'Results are saved automatically \u2014 switching tabs won\u2019t lose them.'
+  );
+
+  /* ── Section 5: 幣別換算 ── */
+  b+=sec('💱', zh?'幣別換算（手動結算用）':'Currency Conversion (manual settlement)', zh?
+    '計算完成後，若需要換算成台幣或其他幣別：<br>'+
+    '1. 選擇目標幣別（TWD/USD/JPY 等 13 種可選）<br>'+
+    '2. 確認或修改匯率（系統給建議值）<br>'+
+    '3. 若有台幣計算的額外費用（如國內機票），按「＋ 新增項目」，填項目名稱和總金額，系統自動 ÷ 付費人數計入售價<br>'+
+    '4. 按「換算」顯示目標幣別的建議售價與利潤'
+    :
+    'After calculating, to convert to another currency:<br>'+
+    '1. Pick target currency (13 options: TWD/USD/JPY etc.)<br>'+
+    '2. Confirm or adjust the rate (suggestion provided)<br>'+
+    '3. For extra costs in target currency (e.g. domestic flights), tap「+ Add Item」, enter name and total amount — auto ÷ paying pax<br>'+
+    '4. Tap Convert to see the target-currency price and profit'
+  );
+
+  /* ── Section 6: 備份/PDF/Excel ── */
+  b+=sec('📁', zh?'備份・PDF匯出・Excel匯入':'Backup · PDF Export · Excel Import', zh?
+    '⚙️ <b>設定頁 → 資料備份與還原</b>：匯出 .json 備份檔，可用於換裝置、防止資料遺失，或當作多裝置手動同步。<br>'+
+    '📄 <b>財務頁右上角 → PDF</b>：產生完整旅程報告（成員名單 + 費用記錄 + 計算結果）可儲存或列印。<br>'+
+    '📥 <b>成員頁 → 匯入Excel</b>：支援 .xlsx/.csv，可下載範本格式批次匯入團員資料。'
+    :
+    '⚙️ <b>Settings → Backup & Restore</b>: export a .json backup for device transfer, data protection, or manual multi-device sync.<br>'+
+    '📄 <b>Finance → PDF button</b>: generates a full trip report (members + expenses + pricing) for saving or printing.<br>'+
+    '📥 <b>Members → Import Excel</b>: supports .xlsx/.csv. Download the template and bulk-import member data.'
+  );
+
+  /* ── Section 7: AI掃描 ── */
+  b+=sec('📷', zh?'AI 掃描（需API金鑰）':'AI Scan (requires API key)', zh?
+    '⚙️ 設定頁 → AI掃描設定 → 輸入 Anthropic API 金鑰。<br>'+
+    '申請：console.anthropic.com 註冊，手機驗證可獲 $5 免費額度（約可掃描上千次）。<br>'+
+    '已有額度？到 Plans & Billing → Credits 加值。<br>'+
+    '支援功能：<br>'+
+    '• 成員新增頁拍護照/潛水證照 → 自動填入姓名、護照號碼、證照資訊'
+    :
+    '⚙️ Settings → AI Scan Setup → enter your Anthropic API key.<br>'+
+    'Sign up at console.anthropic.com; phone verification gives ~$5 free credit (~1000 scans).<br>'+
+    'If credit is low: go to Plans & Billing → Credits to top up.<br>'+
+    'Supported:<br>'+
+    '• In Add Member: scan passport / dive cert photo → auto-fills name, passport no., cert info'
+  );
+
+  b+='<button onclick="closeModal();gotoTab(\'finance\')" class="btn btn-primary btn-full">'+(zh?'開始使用 →':'Get Started →')+'</button>';
+  openModal(zh?'📖 使用說明':'📖 User Guide',b,false,true);
+}
+
+function applyTabLabels(){
+  var tabs=S[LG].tabs||S.en.tabs;
+  document.getElementById('l-sub').textContent=T('sub');
+  document.getElementById('tl-ov').textContent=tabs[0];
+  document.getElementById('tl-tr').textContent=tabs[1];
+  document.getElementById('tl-pe').textContent=tabs[2];
+  document.getElementById('tl-fi').textContent=tabs[3];
+  document.getElementById('tl-do').textContent=tabs[4];
+}
+document.addEventListener('focusin',function(e){
+  if(!e.target) return;
+  var tag=e.target.tagName;
+  if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'){
+    var modal=document.getElementById('modal-bg');
+    if(modal&&modal.classList.contains('on')){
+      setTimeout(function(){ try{ e.target.scrollIntoView({behavior:'smooth',block:'center'}); }catch(err){} },350);
+    }
+  }
+});
+initDB();
+applyTabLabels();
+renderOverview();
+</script>
+</body>
+</html>
